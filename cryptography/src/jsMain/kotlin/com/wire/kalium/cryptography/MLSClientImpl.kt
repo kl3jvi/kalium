@@ -20,14 +20,8 @@ package com.wire.kalium.cryptography
 
 @Suppress("TooManyFunctions")
 actual class MLSClientImpl actual constructor(
-    rootDir: String,
-    databaseKey: MlsDBSecret,
-    clientId: CryptoQualifiedClientId
+    cc: CoreCryptoCentral
 ) : MLSClient {
-
-    override fun clearLocalFiles(): Boolean {
-        TODO("Not yet implemented")
-    }
 
     override fun getPublicKey(): ByteArray {
         TODO("Not yet implemented")
@@ -114,14 +108,6 @@ actual class MLSClientImpl actual constructor(
     }
 
     override fun deriveSecret(groupId: MLSGroupId, keyLength: UInt): ByteArray {
-        TODO("Not yet implemented")
-    }
-
-    override fun newAcmeEnrollment(clientId: E2EIQualifiedClientId, displayName: String, handle: String): E2EIClient {
-        TODO("Not yet implemented")
-    }
-
-    override fun initMLSWithE2EI(e2eiClient: E2EIClient, certificate: CertificateChain) {
         TODO("Not yet implemented")
     }
 }

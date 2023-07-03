@@ -42,6 +42,8 @@ import com.wire.kalium.logic.data.call.VideoStateCheckerImpl
 import com.wire.kalium.logic.data.call.mapper.CallMapper
 import com.wire.kalium.logic.data.client.ClientDataSource
 import com.wire.kalium.logic.data.client.ClientRepository
+import com.wire.kalium.logic.data.client.CoreCryptoCentralProvider
+import com.wire.kalium.logic.data.client.CoreCryptoCentralProviderImpl
 import com.wire.kalium.logic.data.client.E2EClientProvider
 import com.wire.kalium.logic.data.client.E2EIClientProviderImpl
 import com.wire.kalium.logic.data.client.MLSClientProvider
@@ -371,6 +373,12 @@ class UserSessionScope internal constructor(
         )
 
     private val clientIdProvider = CurrentClientIdProvider { clientId() }
+    private val coreCryptoCentralProvider: CoreCryptoCentralProvider = CoreCryptoCentralProviderImpl(
+        rootKeyStorePath = rootPathsProvider.rootMLSPath(userId),
+        userId = userId,
+        passphraseStorage = globalPreferences.passphraseStorage
+    )
+
     private val mlsSelfConversationIdProvider: MLSSelfConversationIdProvider by lazy {
         MLSSelfConversationIdProviderImpl(
             conversationRepository
@@ -425,7 +433,7 @@ class UserSessionScope internal constructor(
     val authenticationScope: AuthenticationScope = authenticationScopeProvider.provide(
         sessionManager.getServerConfig(),
         sessionManager.getProxyCredentials(),
-         globalScope.serverConfigRepository
+        globalScope.serverConfigRepository
     )
 
     private val userConfigRepository: UserConfigRepository
@@ -454,10 +462,9 @@ class UserSessionScope internal constructor(
 
     private val mlsClientProvider: MLSClientProvider by lazy {
         MLSClientProviderImpl(
-            rootKeyStorePath = rootPathsProvider.rootMLSPath(userId),
             userId = userId,
             currentClientIdProvider = clientIdProvider,
-            passphraseStorage = globalPreferences.passphraseStorage
+            coreCryptoCentralProvider = coreCryptoCentralProvider
         )
     }
 
@@ -493,7 +500,7 @@ class UserSessionScope internal constructor(
         E2EIClientProviderImpl(
             userId = userId,
             currentClientIdProvider = clientIdProvider,
-            mlsClientProvider = mlsClientProvider,
+            coreCryptoCentralProvider = coreCryptoCentralProvider,
             userRepository = userRepository
         )
     }

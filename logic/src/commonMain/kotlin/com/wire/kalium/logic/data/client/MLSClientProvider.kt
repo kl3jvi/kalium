@@ -18,17 +18,15 @@
 
 package com.wire.kalium.logic.data.client
 
-import com.wire.kalium.cryptography.CryptoQualifiedClientId
-import com.wire.kalium.cryptography.CryptoUserID
-import com.wire.kalium.cryptography.MLSClient
-import com.wire.kalium.cryptography.MLSClientImpl
-import com.wire.kalium.cryptography.MlsDBSecret
+import com.wire.kalium.cryptography.*
 import com.wire.kalium.logic.CoreFailure
 import com.wire.kalium.logic.data.conversation.ClientId
 import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.feature.CurrentClientIdProvider
 import com.wire.kalium.logic.functional.Either
+import com.wire.kalium.logic.functional.flatMap
 import com.wire.kalium.logic.functional.fold
+import com.wire.kalium.logic.functional.map
 import com.wire.kalium.logic.util.SecurityHelperImpl
 import com.wire.kalium.persistence.dbPassphrase.PassphraseStorage
 import com.wire.kalium.util.FileUtil
@@ -38,50 +36,47 @@ import kotlinx.coroutines.withContext
 
 interface MLSClientProvider {
     suspend fun getMLSClient(clientId: ClientId? = null): Either<CoreFailure, MLSClient>
+    suspend fun getMLSClient(e2EIClient: E2EIClient, certificateChain: CertificateChain): Either<CoreFailure, MLSClient>
 }
 
 class MLSClientProviderImpl(
-    private val rootKeyStorePath: String,
     private val userId: UserId,
     private val currentClientIdProvider: CurrentClientIdProvider,
-    private val passphraseStorage: PassphraseStorage,
+    private val coreCryptoCentralProvider: CoreCryptoCentralProvider,
     private val dispatchers: KaliumDispatcher = KaliumDispatcherImpl
 ) : MLSClientProvider {
 
     private var mlsClient: MLSClient? = null
 
-    override suspend fun getMLSClient(clientId: ClientId?): Either<CoreFailure, MLSClient> = withContext(dispatchers.io) {
-        val currentClientId = clientId ?: currentClientIdProvider().fold({ return@withContext Either.Left(it) }, { it })
-        val cryptoUserId = CryptoUserID(value = userId.value, domain = userId.domain)
+    override suspend fun getMLSClient(clientId: ClientId?): Either<CoreFailure, MLSClient> =
+        withContext(dispatchers.io) {
+            val currentClientId =
+                clientId ?: currentClientIdProvider().fold({ return@withContext Either.Left(it) }, { it })
+            val cryptoUserId = CryptoUserID(value = userId.value, domain = userId.domain)
 
-        val location = "$rootKeyStorePath/${currentClientId.value}".also {
-            // TODO: migrate to okio solution once assert refactor is merged
-            FileUtil.mkDirs(it)
+            return@withContext mlsClient?.let {
+                Either.Right(it)
+            } ?: run {
+//                //init mls client
+//                coreCryptoCentralProvider.getCoreCrypto().flatMap {
+//                    val newClient = it.mlsClient(CryptoQualifiedClientId(currentClientId.value, cryptoUserId).toString())
+//                    mlsClient = newClient
+//                    Either.Right(newClient)
+//                }
+                Either.Left(CoreFailure.MissingClientRegistration)
+            }
         }
 
-        return@withContext mlsClient?.let {
-            Either.Right(it)
-        } ?: run {
-            val newClient = mlsClient(
-                cryptoUserId,
-                currentClientId,
-                location,
-                SecurityHelperImpl(passphraseStorage).mlsDBSecret(userId)
-            )
-            mlsClient = newClient
-            Either.Right(newClient)
+    override suspend fun getMLSClient(e2EIClient: E2EIClient,e2eiCertificateChain: CertificateChain): Either<CoreFailure, MLSClient> =
+        withContext(dispatchers.io) {
+            return@withContext mlsClient?.let {
+                Either.Right(it)
+            } ?: run {
+                coreCryptoCentralProvider.getCoreCrypto().flatMap {
+                    val newClient = it.e2eiMlsClient(e2EIClient,e2eiCertificateChain)
+                    mlsClient = newClient
+                    Either.Right(newClient)
+                }
+            }
         }
-    }
-
-    private fun mlsClient(userId: CryptoUserID, clientId: ClientId, location: String, passphrase: MlsDBSecret): MLSClient {
-        return MLSClientImpl(
-            "$location/$KEYSTORE_NAME",
-            passphrase,
-            CryptoQualifiedClientId(clientId.value, userId)
-        )
-    }
-
-    private companion object {
-        const val KEYSTORE_NAME = "keystore"
-    }
 }

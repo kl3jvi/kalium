@@ -32,6 +32,7 @@ import com.wire.crypto.MlsGroupInfoEncryptionType
 import com.wire.crypto.MlsRatchetTreeType
 import com.wire.crypto.MlsWirePolicy
 import com.wire.crypto.client.CoreCryptoCentral.Companion.lower
+import com.wire.crypto.client.MLSClientImpl.Companion.toUByteList
 import io.ktor.util.decodeBase64Bytes
 import io.ktor.util.encodeBase64
 import java.io.File
@@ -40,66 +41,22 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlin.time.toJavaDuration
 
-private class Callbacks : CoreCryptoCallbacks {
-
-    override fun authorize(conversationId: List<UByte>, clientId: List<UByte>): Boolean {
-        // We always return true because our BE is currently enforcing that this constraint is always true
-        return true
-    }
-
-    override fun clientIsExistingGroupUser(
-        conversationId: ConversationId,
-        clientId: ClientId,
-        existingClients: List<ClientId>,
-        parentConversationClients: List<ClientId>?
-    ): Boolean {
-        // TODO disabled until we have subconversation support in CC
-//         val userId = toClientID(clientId)?.userId ?: return false
-//         return existingClients.find {
-//             toClientID(it)?.userId == userId
-//         } != null
-        return true
-    }
-
-    override fun userAuthorize(
-        conversationId: ConversationId,
-        externalClientId: ClientId,
-        existingClients: List<ClientId>
-    ): Boolean {
-        // We always return true because our BE is currently enforcing that this constraint is always true
-        return true
-    }
-
-    companion object {
-        fun toClientID(rawClientId: List<UByte>): CryptoQualifiedClientId? =
-            CryptoQualifiedClientId.fromEncodedString(String(MLSClientImpl.toByteArray(rawClientId)))
-    }
-
-}
 
 @Suppress("TooManyFunctions")
 @OptIn(ExperimentalUnsignedTypes::class)
 actual class MLSClientImpl actual constructor(
-    private val rootDir: String,
-    databaseKey: MlsDBSecret,
-    clientId: CryptoQualifiedClientId
+    cc: CoreCryptoCentral
 ) : MLSClient {
 
-    private val coreCrypto: CoreCrypto
     private val keyRotationDuration: Duration = 30.toDuration(DurationUnit.DAYS)
-    private val defaultGroupConfiguration = CustomConfiguration(keyRotationDuration.toJavaDuration(), MlsWirePolicy.PLAINTEXT)
+    private val defaultGroupConfiguration =
+        CustomConfiguration(keyRotationDuration.toJavaDuration(), MlsWirePolicy.PLAINTEXT)
     private val defaultCiphersuite = CiphersuiteName.MLS_128_DHKEMX25519_AES128GCM_SHA256_ED25519.lower()
-    private val defaultE2EIExpiry: UInt = 90U
 
-    init {
-        coreCrypto = CoreCrypto(rootDir, databaseKey.value, toUByteList(clientId.toString()), listOf(defaultCiphersuite))
-        coreCrypto.setCallbacks(Callbacks())
+    private val coreCrypto = (cc as CoreCryptoCentralImpl).cc
+    override fun mlsInit(clientId: String) {
+        coreCrypto.mlsInit(clientId.toUByteList(), listOf(defaultCiphersuite))
     }
-
-    override fun clearLocalFiles(): Boolean {
-        return File(rootDir).deleteRecursively()
-    }
-
     override fun getPublicKey(): ByteArray {
         return coreCrypto.clientPublicKey(defaultCiphersuite).toUByteArray().asByteArray()
     }
@@ -136,10 +93,12 @@ actual class MLSClientImpl actual constructor(
     }
 
     override fun joinByExternalCommit(publicGroupState: ByteArray): CommitBundle {
-        return toCommitBundle(coreCrypto.joinByExternalCommit(
-            toUByteList(publicGroupState),
-            defaultGroupConfiguration,
-            MlsCredentialType.BASIC)
+        return toCommitBundle(
+            coreCrypto.joinByExternalCommit(
+                toUByteList(publicGroupState),
+                defaultGroupConfiguration,
+                MlsCredentialType.BASIC
+            )
         )
     }
 
@@ -241,22 +200,6 @@ actual class MLSClientImpl actual constructor(
 
     override fun deriveSecret(groupId: MLSGroupId, keyLength: UInt): ByteArray {
         return toByteArray(coreCrypto.exportSecretKey(toUByteList(groupId.decodeBase64Bytes()), keyLength))
-    }
-
-    override fun newAcmeEnrollment(clientId: E2EIQualifiedClientId, displayName: String, handle: String): E2EIClient {
-        return E2EIClientImpl(
-            coreCrypto.e2eiNewEnrollment(
-                clientId.toString(),
-                displayName,
-                handle,
-                defaultE2EIExpiry,
-                defaultCiphersuite
-            )
-        )
-    }
-
-    override fun initMLSWithE2EI(e2eiClient: E2EIClient, certificate: CertificateChain) {
-        coreCrypto.e2eiMlsInit((e2eiClient as E2EIClientImpl).wireE2eIdentity, certificate)
     }
 
     companion object {

@@ -15,18 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
-
 package com.wire.kalium.cryptography
+typealias EnrollmentHandle = ByteArray
 
-import java.nio.file.Files
+interface CoreCryptoCentral {
 
-actual open class BaseMLSClientTest {
+    fun mlsClient(clientId: String): MLSClient
 
-    actual fun createMLSClient(clientId: CryptoQualifiedClientId): MLSClient {
-        val root = Files.createTempDirectory("mls").toFile()
-        val keyStore = root.resolve("keystore-$clientId")
-        TODO()
-        //return MLSClientImpl(keyStore.absolutePath, MlsDBSecret("test"), clientId)
-    }
+    fun e2eiNewEnrollment(
+        clientId: String,
+        displayName: String,
+        handle: String
+    ): E2EIClient
 
+    fun e2eiMlsClient(enrollment: E2EIClient, certificateChain: String): MLSClient
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun e2eiEnrollmentStash(enrollment: E2EIClient): EnrollmentHandle
+    @OptIn(ExperimentalUnsignedTypes::class)
+    fun e2eiEnrollmentStashPop(handle: EnrollmentHandle): E2EIClient
 }
+expect class CoreCryptoCentralImpl(rootDir: String, databaseKey: String) : CoreCryptoCentral

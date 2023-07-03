@@ -74,9 +74,7 @@ private class Callbacks : CoreCryptoCallbacks {
 @Suppress("TooManyFunctions")
 @OptIn(ExperimentalUnsignedTypes::class)
 actual class MLSClientImpl actual constructor(
-    private val rootDir: String,
-    databaseKey: MlsDBSecret,
-    clientId: CryptoQualifiedClientId
+    cc: CoreCryptoCentral
 ) : MLSClient {
 
     private val coreCrypto: CoreCrypto
@@ -84,21 +82,11 @@ actual class MLSClientImpl actual constructor(
     private val defaultGroupConfiguration = CustomConfiguration(keyRotationDuration, MlsWirePolicy.PLAINTEXT)
 
     init {
-        coreCrypto = CoreCrypto(rootDir, databaseKey.value, toUByteList(clientId.toString()), null)
-        coreCrypto.setCallbacks(Callbacks())
+        coreCrypto = (cc as CoreCryptoCentralImpl).cc
     }
 
-    override fun clearLocalFiles(): Boolean {
-        memScoped {
-            val error = alloc<ObjCObjectVar<NSError?>>()
-            val result = NSFileManager.defaultManager.removeItemAtPath(rootDir, error.ptr)
-
-            if (error.value != null) {
-                kaliumLogger.e("failed to clear local files: ${error.value}")
-            }
-
-            return result
-        }
+    override fun mlsInit(clientId: String) {
+        TODO("Not yet implemented")
     }
 
     override fun getPublicKey(): ByteArray {
@@ -225,14 +213,6 @@ actual class MLSClientImpl actual constructor(
 
     override fun deriveSecret(groupId: MLSGroupId, keyLength: UInt): ByteArray {
         return toByteArray(coreCrypto.exportSecretKey(toUByteList(groupId.decodeBase64Bytes()), keyLength))
-    }
-
-    override fun newAcmeEnrollment(clientId: E2EIQualifiedClientId, displayName: String, handle: String): E2EIClient {
-        TODO("Not yet implemented")
-    }
-
-    override fun initMLSWithE2EI(e2eiClient: E2EIClient, certificate: CertificateChain) {
-        TODO("Not yet implemented")
     }
 
     companion object {

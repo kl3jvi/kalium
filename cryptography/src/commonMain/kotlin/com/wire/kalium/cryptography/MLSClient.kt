@@ -20,6 +20,7 @@ package com.wire.kalium.cryptography
 
 import kotlin.jvm.JvmInline
 
+
 typealias WelcomeMessage = ByteArray
 typealias HandshakeMessage = ByteArray
 typealias ApplicationMessage = ByteArray
@@ -66,13 +67,7 @@ value class Ed22519Key(
 @Suppress("TooManyFunctions")
 interface MLSClient {
 
-    /**
-     * Release any locks the C code have on the MLS resources and
-     * delete local MLS DB and files
-     *
-     * @return true when delete is successful and false otherwise
-     */
-    fun clearLocalFiles(): Boolean
+    fun mlsInit(clientId: String)
 
     /**
      * Public key of the client's identity.
@@ -268,19 +263,6 @@ interface MLSClient {
      * @return secret key
      */
     fun deriveSecret(groupId: MLSGroupId, keyLength: UInt): ByteArray
-
-    /**
-     * Enroll Wire E2EIdentity ACME Client for E2
-     *
-     * @return wire end to end identity client
-     */
-    fun newAcmeEnrollment(
-        clientId: E2EIQualifiedClientId,
-        displayName: String,
-        handle: String
-    ): E2EIClient
-
-    fun initMLSWithE2EI(e2eiClient: E2EIClient, certificate: CertificateChain)
 }
 
-expect class MLSClientImpl(rootDir: String, databaseKey: MlsDBSecret, clientId: CryptoQualifiedClientId) : MLSClient
+expect class MLSClientImpl(cc: CoreCryptoCentral) : MLSClient

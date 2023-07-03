@@ -62,7 +62,7 @@ interface E2EIRepository {
     suspend fun initMLSClientWithCertificate(certificateChain: String)
 }
 
-class E2EIRepositoryImpl(
+internal class E2EIRepositoryImpl(
     private val e2EIApi: E2EIApi,
     private val acmeApi: ACMEApi,
     private val e2EClientProvider: E2EClientProvider,
@@ -193,9 +193,7 @@ class E2EIRepositoryImpl(
 
     override suspend fun initMLSClientWithCertificate(certificateChain: String) {
         e2EClientProvider.getE2EIClient().flatMap { e2eiClient ->
-            mlsClientProvider.getMLSClient().map {
-                it.initMLSWithE2EI(e2eiClient, certificateChain)
-            }
+            mlsClientProvider.getMLSClient(e2eiClient,certificateChain)
         }
     }
 }

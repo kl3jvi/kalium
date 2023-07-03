@@ -34,9 +34,10 @@ class E2EIClientTest : BaseMLSClientTest() {
     }
 
     private fun createE2EIClient(user: SampleUser): E2EIClient {
-        return createMLSClient(user.qualifiedClientId).newAcmeEnrollment(
-            user.e2eiCryptoId, user.name, user.handle
-        )
+        TODO()
+//         return createMLSClient(user.qualifiedClientId).newAcmeEnrollment(
+//             user.e2eiCryptoId, user.name, user.handle
+//         )
     }
 
     @Test

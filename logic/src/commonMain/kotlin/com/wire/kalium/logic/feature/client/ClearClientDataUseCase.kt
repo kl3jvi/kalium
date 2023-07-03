@@ -65,10 +65,6 @@ internal class ClearClientDataUseCaseImpl internal constructor(
         wrapProteusRequest {
             proteusClientProvider.clearLocalFiles()
         }.flatMap {
-            mlsClientProvider.getMLSClient().getOrNull()?.let { mlsClient ->
-                wrapMLSRequest {
-                    mlsClient.clearLocalFiles()
-                }
-            } ?: Either.Right(false)
+            TODO()
         }
 }

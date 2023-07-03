@@ -34,14 +34,14 @@ import com.wire.kalium.util.KaliumDispatcher
 import com.wire.kalium.util.KaliumDispatcherImpl
 import kotlinx.coroutines.withContext
 
-interface E2EClientProvider {
+internal interface E2EClientProvider {
     suspend fun getE2EIClient(clientId: ClientId? = null): Either<CoreFailure, E2EIClient>
 }
 
 internal class E2EIClientProviderImpl(
     private val userId: UserId,
     private val currentClientIdProvider: CurrentClientIdProvider,
-    private val mlsClientProvider: MLSClientProvider,
+    private val coreCryptoCentralProvider: CoreCryptoCentralProvider,
     private val userRepository: UserRepository,
     private val dispatchers: KaliumDispatcher = KaliumDispatcherImpl
 ) : E2EClientProvider {
@@ -61,9 +61,9 @@ internal class E2EIClientProviderImpl(
                 Either.Right(it)
             } ?: run {
                 getSelfUserInfo().flatMap { selfUser ->
-                    mlsClientProvider.getMLSClient(currentClientId).flatMap {
-                        val newE2EIClient = it.newAcmeEnrollment(
-                            e2eiClientId,
+                    coreCryptoCentralProvider.getCoreCrypto().flatMap {
+                        val newE2EIClient = it.e2eiNewEnrollment(
+                            e2eiClientId.toString(),
                             selfUser.first,
                             selfUser.second
                         )
