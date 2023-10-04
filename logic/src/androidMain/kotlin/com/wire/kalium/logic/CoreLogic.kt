@@ -54,7 +54,7 @@ actual class CoreLogic(
         kaliumConfigs.shouldEncryptData
     )
 
-    override val dataStore: DataStore<Preferences> get() = getDataStore(appContext)
+    override val dataStore: DataStore<Preferences> get() = getDataStore(appContext).dataStore
 
     override val globalDatabase: GlobalDatabaseProvider = GlobalDatabaseProvider(
         appContext,

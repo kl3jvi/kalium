@@ -18,9 +18,33 @@
 package com.wire.kalium.persistence.datastore
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
+import okio.Path.Companion.toPath
 
-fun getDataStore(context: Context): DataStore<Preferences> = getDataStore(
-    producePath = { context.filesDir.resolve(DATA_STORE_FILENAME).absolutePath }
-)
+
+private lateinit var dataStore: MultiplatformDataStore
+
+private val lock = SynchronizedObject()
+
+/**
+ * Gets the singleton DataStore instance, creating it if necessary.
+ */
+fun getDataStore(context: Context): MultiplatformDataStore =
+    synchronized(lock) {
+        if (::dataStore.isInitialized) {
+            dataStore
+        } else {
+            MultiplatformDataStore(
+                PreferenceDataStoreFactory.createWithPath(
+                    produceFile = { producePath(context).toPath() }
+                )
+            ).also {
+                dataStore = it
+            }
+        }
+    }
+
+fun producePath(context: Context): String =
+    context.filesDir.resolve(DATA_STORE_FILENAME).absolutePath

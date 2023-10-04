@@ -20,10 +20,10 @@ package com.wire.kalium.logic.data
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import com.wire.kalium.logic.StorageFailure
 import com.wire.kalium.logic.functional.Either
 import com.wire.kalium.logic.wrapStorageNullableRequest
-import com.wire.kalium.persistence.datastore.USERS_LOGGED_IN
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -46,3 +46,5 @@ class AccessRepositoryDataSource(
         }
     }
 }
+
+val USERS_LOGGED_IN = intPreferencesKey("logged_in_users_count")

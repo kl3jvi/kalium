@@ -17,22 +17,51 @@
  */
 package com.wire.kalium.persistence.datastore
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.SupervisorJob
+import okio.Path.Companion.toPath
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 
-fun getDataStore(): DataStore<Preferences> = getDataStore(
-    producePath = {
-        val documentDirectory: NSURL? = NSFileManager.defaultManager.URLForDirectory(
-            directory = NSDocumentDirectory,
-            inDomain = NSUserDomainMask,
-            appropriateForURL = null,
-            create = false,
-            error = null,
-        )
-        requireNotNull(documentDirectory).path + "/$DATA_STORE_FILENAME"
+private lateinit var dataStore: MultiplatformDataStore
+
+private val lock = SynchronizedObject()
+
+/**
+ * Gets the singleton DataStore instance, creating it if necessary.
+ */
+fun getDataStore(): MultiplatformDataStore =
+    synchronized(lock) {
+        if (::dataStore.isInitialized) {
+            dataStore
+        } else {
+            MultiplatformDataStore(
+                PreferenceDataStoreFactory.createWithPath(
+                    produceFile = { producePath().toPath() },
+                    scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+                    migrations = listOf(),
+                    corruptionHandler = null
+                )
+            ).also {
+                dataStore = it
+            }
+        }
     }
-)
+
+fun producePath(): String {
+    val documentDirectory: NSURL? = NSFileManager.defaultManager.URLForDirectory(
+        directory = NSDocumentDirectory,
+        inDomain = NSUserDomainMask,
+        appropriateForURL = null,
+        create = false,
+        error = null,
+    )
+    return requireNotNull(documentDirectory).path + "/$DATA_STORE_FILENAME"
+}
