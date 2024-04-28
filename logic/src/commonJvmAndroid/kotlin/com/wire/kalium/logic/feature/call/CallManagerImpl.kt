@@ -126,7 +126,7 @@ class CallManagerImpl internal constructor(
 
     private val clientId: Deferred<ClientId> = scope.async(start = CoroutineStart.LAZY) {
         currentClientIdProvider().fold({
-            TODO("adjust correct variable calling")
+            ClientId("ASD")
         }, {
             callingLogger.d("$TAG - clientId $it")
             it
