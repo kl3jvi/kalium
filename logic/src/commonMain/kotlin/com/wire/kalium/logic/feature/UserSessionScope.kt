@@ -1869,9 +1869,12 @@ class UserSessionScope internal constructor(
     val markE2EIRequiredAsNotified: MarkEnablingE2EIAsNotifiedUseCase
         get() = MarkEnablingE2EIAsNotifiedUseCaseImpl(userConfigRepository)
 
+    private val isMlsEnabledUseCase: IsMLSEnabledUseCase
+        get() = IsMLSEnabledUseCaseImpl(featureSupport,userConfigRepository)
+
     @OptIn(DelicateKaliumApi::class)
     private val isAllowedToRegisterMLSClient: IsAllowedToRegisterMLSClientUseCase
-        get() = IsAllowedToRegisterMLSClientUseCaseImpl(featureSupport, mlsPublicKeysRepository)
+        get() = IsAllowedToRegisterMLSClientUseCaseImpl(isMlsEnabledUseCase, mlsPublicKeysRepository)
 
     private val syncFeatureConfigsUseCase: SyncFeatureConfigsUseCase
         get() = SyncFeatureConfigsUseCaseImpl(
