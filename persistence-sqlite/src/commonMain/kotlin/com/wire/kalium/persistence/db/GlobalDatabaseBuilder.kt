@@ -43,7 +43,7 @@ class GlobalDatabaseBuilder internal constructor(
     private val sqlDriver: SqlDriver,
     private val platformDatabaseData: PlatformDatabaseData,
     private val queriesContext: CoroutineContext = KaliumDispatcherImpl.io
-) {
+) : KaliumGlobalDatabase {
 
     internal val database: GlobalDatabase = GlobalDatabase(
         sqlDriver,
@@ -65,15 +65,19 @@ class GlobalDatabaseBuilder internal constructor(
         database.globalDatabasePropertiesQueries.enableForeignKeyContraints()
     }
 
-    val serverConfigurationDAO: ServerConfigurationDAO
+    override val serverConfigurationDAO: ServerConfigurationDAO
         get() = ServerConfigurationDAOImpl(database.serverConfigurationQueries, queriesContext)
 
-    val accountsDAO: AccountsDAO
+    override val accountsDAO: AccountsDAO
         get() = AccountsDAOImpl(database.accountsQueries, database.currentAccountQueries, queriesContext)
 
-    fun nuke(): Boolean {
+    override fun nuke(): Boolean {
         sqlDriver.close()
         return nuke(platformDatabaseData)
+    }
+
+    override fun globalDatabaseProvider(platformDatabaseData: PlatformDatabaseData): KaliumGlobalDatabase {
+        return com.wire.kalium.persistence.db.globalDatabaseProvider(platformDatabaseData, KaliumDispatcherImpl.io, null, true)
     }
 }
 
