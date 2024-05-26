@@ -32,7 +32,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":persistence"))
+                implementation(project(":persistence-sqlite"))
                 implementation(libs.kotlin.test)
                 // coroutines
                 implementation(libs.coroutines.core)

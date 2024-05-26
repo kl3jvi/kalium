@@ -35,7 +35,7 @@ kotlin {
             dependencies {
                 implementation(project(":network"))
                 implementation(project(":cryptography"))
-                implementation(project(":persistence"))
+                implementation(project(":persistence-sqlite"))
                 implementation(project(":protobuf"))
                 implementation(project(":logger"))
 

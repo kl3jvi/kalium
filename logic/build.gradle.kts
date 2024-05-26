@@ -39,7 +39,7 @@ kotlin {
                 implementation(project(":network"))
                 api(project(":network-util"))
                 implementation(project(":cryptography"))
-                implementation(project(":persistence"))
+                implementation(project(":persistence-sqlite"))
                 implementation(project(":protobuf"))
                 api(project(":logger"))
                 api(project(":calling"))

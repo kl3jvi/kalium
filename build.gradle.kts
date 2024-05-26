@@ -131,7 +131,7 @@ dependencies {
     kover(project(":util"))
     kover(project(":network"))
     kover(project(":network-util"))
-    kover(project(":persistence"))
+    kover(project(":persistence-sqlite"))
     kover(project(":logger"))
     kover(project(":calling"))
     kover(project(":protobuf"))

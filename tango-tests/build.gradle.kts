@@ -28,7 +28,7 @@ kotlin {
             dependencies {
                 implementation(project(":network"))
                 implementation(project(":logic"))
-                implementation(project(":persistence"))
+                implementation(project(":persistence-sqlite"))
                 implementation(libs.kotlin.test)
                 implementation(libs.settings.kmpTest)
 
