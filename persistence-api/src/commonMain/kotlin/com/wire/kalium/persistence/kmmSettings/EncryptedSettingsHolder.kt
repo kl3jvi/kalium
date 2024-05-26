@@ -18,7 +18,6 @@
 
 package com.wire.kalium.persistence.kmmSettings
 
-import com.russhwolf.settings.Settings
 import com.wire.kalium.persistence.dao.UserIDEntity
 import com.wire.kalium.persistence.util.FileNameUtil
 
@@ -35,7 +34,4 @@ internal sealed class SettingOptions {
     }
 }
 
-internal expect object EncryptedSettingsBuilder {
-    fun build(options: SettingOptions, param: EncryptedSettingsPlatformParam): Settings
-}
-internal expect class EncryptedSettingsPlatformParam
+interface EncryptedSettingsPlatformParam

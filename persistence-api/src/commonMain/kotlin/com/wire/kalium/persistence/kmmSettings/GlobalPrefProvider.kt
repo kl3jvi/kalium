@@ -22,7 +22,7 @@ import com.wire.kalium.persistence.client.AuthTokenStorage
 import com.wire.kalium.persistence.client.TokenStorage
 import com.wire.kalium.persistence.dbPassphrase.PassphraseStorage
 
-expect class GlobalPrefProvider {
+interface GlobalPrefProvider {
     val authTokenStorage: AuthTokenStorage
     val passphraseStorage: PassphraseStorage
     val tokenStorage: TokenStorage

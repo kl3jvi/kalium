@@ -73,6 +73,7 @@ kotlin {
 
                 implementation(project(":util"))
                 api(project(":logger"))
+                api(project(":persistence-api"))
             }
         }
         val commonTest by getting {
