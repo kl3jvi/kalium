@@ -24,14 +24,13 @@ plugins {
 }
 
 kaliumLibrary {
-    multiplatform { }
+    multiplatform { enableJs.set(false) }
 }
 kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(project(":data"))
-                implementation(project(":network-model"))
 
                 implementation(libs.ktor.utils)
                 implementation(libs.coroutines.core)

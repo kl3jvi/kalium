@@ -15,9 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package com.wire.backup.import
+package com.wire.backup.data
 
-class MPBackupImporter(val pathToFile: String) {
+import com.wire.kalium.logic.data.id.ConversationId
+import com.wire.kalium.logic.data.id.QualifiedID
 
-    fun import(onDataImported: (BackupData))
+sealed interface BackupData {
+
+    data class User(
+        val id: QualifiedID,
+        val name: String,
+        val handle: String,
+    ) : BackupData
+
+    data class Conversation(val conversationId: ConversationId, val name: String) : BackupData
+
+    sealed interface Message : BackupData {
+        val conversationId: ConversationId
+
+        data class Text(
+            override val conversationId: ConversationId,
+            val textValue: String,
+        ) : Message
+    }
 }

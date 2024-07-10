@@ -15,9 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package com.wire.backup.import
+package com.wire.backup.export
 
-class MPBackupImporter(val pathToFile: String) {
+import com.wire.backup.data.BackupData
 
-    fun import(onDataImported: (BackupData))
+class MPBackupExporter(private val exportPath: String) {
+
+    fun add(user: BackupData.User) {
+
+    }
+
+    fun add(conversation: BackupData.Conversation) {
+
+    }
+
+    fun add(message: BackupData.Message) {
+
+    }
 }
