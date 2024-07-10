@@ -23,12 +23,11 @@ import com.oldguy.common.io.ZipEntry
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
 import com.wire.backup.zip.ZipEntries
-import com.wire.kalium.logic.data.id.ConversationId
-import com.wire.kalium.logic.data.id.QualifiedID
 import com.wire.kalium.logic.data.web.KtxWebSerializer
 import com.wire.kalium.logic.data.web.WebEventContent
 import com.wire.kalium.logic.data.web.WebTextData
 import kotlinx.serialization.encodeToString
+import okio.Buffer
 
 class MPBackupExporter(exportPath: String) {
 
@@ -55,27 +54,29 @@ class MPBackupExporter(exportPath: String) {
 
     suspend fun flushToFile() {
         // TODO: maybe perform BackupData -> storage format in parallel, instead of one entry at a time.
+        val events: List<WebEventContent> = allMessages.map {
+            when (it) {
+                is BackupData.Message.Text -> {
+                    WebEventContent.Conversation.TextMessage(
+                        qualifiedConversation = it.conversationId,
+                        qualifiedFrom = it.senderUserId,
+                        from = it.senderUserId.value,
+                        fromClientId = it.senderClientId,
+                        time = it.time.toString(),
+                        id = it.messageId,
+                        data = WebTextData(it.textValue, false, 0),
+                        reactions = null
+                    )
+                }
+            }
+        }
+        val outputBuffer = Buffer()
+        outputBuffer.write(KtxWebSerializer.json.encodeToString(events).encodeToByteArray())
         zipFile.use { file ->
             file.addEntry(
                 ZipEntry(ZipEntries.EVENTS.entryName),
             ) {
-                val events: List<WebEventContent> = allMessages.map {
-                    when (it) {
-                        is BackupData.Message.Text -> {
-                            WebEventContent.Conversation.TextMessage(
-                                qualifiedConversation = it.conversationId,
-                                qualifiedFrom = it.senderUserId,
-                                from = it.senderUserId.value,
-                                fromClientId = it.senderClientId,
-                                time = it.time.toString(),
-                                id = it.messageId,
-                                data = WebTextData(it.textValue, false, 0),
-                                reactions = null
-                            )
-                        }
-                    }
-                }
-                KtxWebSerializer.json.encodeToString(events).encodeToByteArray()
+                outputBuffer.readByteArray()
             }
         }
     }

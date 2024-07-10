@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+
 /*
  * Wire
  * Copyright (C) 2024 Wire Swiss GmbH
@@ -27,6 +29,14 @@ kaliumLibrary {
     multiplatform { enableJs.set(false) }
 }
 kotlin {
+    val xcf = XCFramework()
+    val appleTargets = listOf(iosX64(), iosArm64(), iosSimulatorArm64(), macosArm64(), macosX64())
+    appleTargets.forEach {
+        it.binaries.framework {
+            baseName = "backup"
+            xcf.add(this)
+        }
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -40,6 +50,12 @@ kotlin {
 
                 implementation(libs.kmpIo)
                 implementation(libs.okio.core)
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.coroutines.test)
             }
         }
     }

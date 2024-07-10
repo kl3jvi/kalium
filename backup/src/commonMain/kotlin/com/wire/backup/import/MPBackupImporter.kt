@@ -22,8 +22,6 @@ import com.oldguy.common.io.FileMode
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
 import com.wire.backup.zip.ZipEntries
-import com.wire.kalium.logic.data.id.ConversationId
-import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.data.web.KtxWebSerializer
 import com.wire.kalium.logic.data.web.WebEventContent
 import kotlinx.datetime.Instant
@@ -39,8 +37,10 @@ class MPBackupImporter(pathToFile: String) {
     private suspend fun getWebEventsFromBackup(): List<WebEventContent> {
         // TODO: Read other backed up files
         val buffer = Buffer()
-        zipFile.readEntry(ZipEntries.EVENTS.entryName) { entry, content, count, isLast ->
-            buffer.write(content)
+        zipFile.use { file ->
+            file.readEntry(ZipEntries.EVENTS.entryName) { entry, content, count, isLast ->
+                buffer.write(content)
+            }
         }
         val fileString = buffer.readUtf8()
         return KtxWebSerializer.json.decodeFromString<List<WebEventContent>>(fileString)
