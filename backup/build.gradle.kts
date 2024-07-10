@@ -38,9 +38,7 @@ kotlin {
                 implementation(libs.ktxSerialization)
                 implementation(libs.ktor.serialization)
 
-                implementation(libs.faker)
-
-
+                implementation(libs.okio.core)
             }
         }
     }
