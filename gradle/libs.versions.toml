@@ -24,6 +24,7 @@ androidx-arch = "2.2.0"
 androidx-test-orchestrator = "1.4.2"
 androidx-sqlite = "2.4.0"
 benasher-uuid = "0.8.0"
+kmpIo = "0.1.6"
 ktx-datetime = { strictly = "0.5.0" }
 ktx-serialization = "1.6.3"
 ktx-atomicfu = "0.24.0"
@@ -170,6 +171,9 @@ ktor-statusPages = { module = "io.ktor:ktor-server-status-pages", version.ref = 
 # okio
 okio-core = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okio-test = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
+
+# kmp-io
+kmpIo = { module = "io.github.skolson:kmp-io", version.ref = "kmpIo" }
 
 # sql dependencies
 sqlite-androidx = { module = "androidx.sqlite:sqlite", version.ref = "androidx-sqlite" }

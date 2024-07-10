@@ -39,7 +39,7 @@ kotlin {
                 implementation(libs.ktxSerialization)
                 implementation(libs.ktor.serialization)
 
-                implementation(libs.okio.core)
+                implementation(libs.kmpIo)
             }
         }
     }
