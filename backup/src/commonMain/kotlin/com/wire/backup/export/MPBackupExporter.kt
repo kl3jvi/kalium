@@ -27,6 +27,7 @@ import com.wire.kalium.logic.data.id.ConversationId
 import com.wire.kalium.logic.data.id.QualifiedID
 import com.wire.kalium.logic.data.web.KtxWebSerializer
 import com.wire.kalium.logic.data.web.WebEventContent
+import com.wire.kalium.logic.data.web.WebTextData
 import kotlinx.serialization.encodeToString
 
 class MPBackupExporter(exportPath: String) {
@@ -36,7 +37,7 @@ class MPBackupExporter(exportPath: String) {
         FileMode.Write
     )
 
-//     private val allUsers = ArrayList<BackupData.User>()
+    //     private val allUsers = ArrayList<BackupData.User>()
 //     private val allConversations = ArrayList<BackupData.Conversation>()
     private val allMessages = ArrayList<BackupData.Message>()
 
@@ -59,27 +60,23 @@ class MPBackupExporter(exportPath: String) {
                 ZipEntry(ZipEntries.EVENTS.entryName),
             ) {
                 val events: List<WebEventContent> = allMessages.map {
-                    WebEventContent.Conversation.TextMessage(
-                        it.conversationId, it.
-                    )
+                    when (it) {
+                        is BackupData.Message.Text -> {
+                            WebEventContent.Conversation.TextMessage(
+                                qualifiedConversation = it.conversationId,
+                                qualifiedFrom = it.senderUserId,
+                                from = it.senderUserId.value,
+                                fromClientId = it.senderClientId,
+                                time = it.time.toString(),
+                                id = it.messageId,
+                                data = WebTextData(it.textValue, false, 0),
+                                reactions = null
+                            )
+                        }
+                    }
                 }
                 KtxWebSerializer.json.encodeToString(events).encodeToByteArray()
             }
         }
-    }
-}
-
-
-suspend fun example() {
-    // App code:
-    backupUseCase.invoke(Context.getFile("backup.zip"))
-
-    // Inside the UseCase:
-    MPBackupExporter("backup.zip").apply {
-        repository.getAll().forEach {
-            add(BackupData.User(QualifiedID("", "asod"), "Name", "handle"))
-            add(BackupData.Message.Text(ConversationId("asd", "asd"), "Hello!!!"))
-        }
-        flushToFile()
     }
 }

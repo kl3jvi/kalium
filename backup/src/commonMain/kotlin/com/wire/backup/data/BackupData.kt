@@ -36,13 +36,14 @@ sealed interface BackupData {
         val senderUserId: UserId
         val conversationId: ConversationId
         val time: Instant
+        val senderClientId: String
 
         data class Text(
             override val messageId: String,
             override val conversationId: ConversationId,
             override val senderUserId: UserId,
             override val time: Instant,
-            val senderClientId: String,
+            override val senderClientId: String,
             val textValue: String,
         ) : Message
     }

@@ -22,8 +22,11 @@ import com.oldguy.common.io.FileMode
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
 import com.wire.backup.zip.ZipEntries
+import com.wire.kalium.logic.data.id.ConversationId
+import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.data.web.KtxWebSerializer
 import com.wire.kalium.logic.data.web.WebEventContent
+import kotlinx.datetime.Instant
 import okio.Buffer
 
 class MPBackupImporter(pathToFile: String) {
@@ -44,34 +47,27 @@ class MPBackupImporter(pathToFile: String) {
     }
 
     suspend fun import(onDataImported: (BackupData) -> Unit) {
-
         val webStuff = getWebEventsFromBackup()
         webStuff.forEach { webEvent ->
             // webEvent -> BackupData
-            val backupData = when(webEvent) {
-                is WebEventContent.Conversation.AssetMessage -> TODO()
-                is WebEventContent.Conversation.KnockMessage -> TODO()
-                is WebEventContent.Conversation.NewGroup -> TODO()
+            if (webEvent !is WebEventContent.Conversation) return@forEach
+
+            val backupData = when (webEvent) {
+                is WebEventContent.Conversation.AssetMessage -> null
+                is WebEventContent.Conversation.KnockMessage -> null
+                is WebEventContent.Conversation.NewGroup -> null
                 is WebEventContent.Conversation.TextMessage -> BackupData.Message.Text(
-
+                    messageId = webEvent.id,
+                    conversationId = webEvent.qualifiedConversation,
+                    senderUserId = webEvent.qualifiedFrom!!, // TODO: Bang bang!
+                    time = Instant.parse(webEvent.time),
+                    senderClientId = webEvent.fromClientId!!, // TODO: Bang bang!
+                    textValue = webEvent.data.text
                 )
-                WebEventContent.Unknown -> TODO()
+
+                WebEventContent.Unknown -> null
             }
-            onDataImported(backupData)
-        }
-    }
-}
-
-suspend fun example() {
-    // App code:
-    restoreFromBackup.invoke(Context.getFile("backup.zip"))
-
-    // Inside the UseCase:
-    MPBackupImporter("backup.zip").import { data ->
-        when(data) {
-            is BackupData.Conversation -> insertConversation(data)
-            is BackupData.Message.Text -> insertMessage(data)
-            is BackupData.User -> insertUser(user)
+            backupData?.let { onDataImported(it) }
         }
     }
 }
