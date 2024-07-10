@@ -196,7 +196,7 @@ class SendTextMessageCaseTest {
         coVerify {
             arrangement.persistMessage.invoke(matches { message ->
                 (message.content as MessageContent.Text).linkPreviews.get(0).image != null
-                        && (message.content as MessageContent.Text).linkPreviews.get(0).image?.otrKey != AES256Key(ByteArray(0))
+                        && !(message.content as MessageContent.Text).linkPreviews[0].image?.otrKey.contentEquals(ByteArray(0))
             })
         }.wasInvoked(once)
     }

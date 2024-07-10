@@ -60,11 +60,11 @@ class ObserveSelfDeletionTimerSettingsForConversationUseCaseImpl internal constr
                     teamSettings.fold({
                         onTeamEnabled(conversationDetailsEither, considerSelfUserSettings)
                     }, {
-                        when (it.enforcedSelfDeletionTimer) {
+                        when (val timer = it.enforcedSelfDeletionTimer) {
                             TeamSelfDeleteTimer.Disabled -> SelfDeletionTimer.Disabled
                             TeamSelfDeleteTimer.Enabled -> onTeamEnabled(conversationDetailsEither, considerSelfUserSettings)
                             is TeamSelfDeleteTimer.Enforced -> SelfDeletionTimer.Enforced.ByTeam(
-                                it.enforcedSelfDeletionTimer.enforcedDuration
+                                timer.enforcedDuration
                             )
                         }
                     })
@@ -75,8 +75,9 @@ class ObserveSelfDeletionTimerSettingsForConversationUseCaseImpl internal constr
         conversation.fold({
             SelfDeletionTimer.Enabled(null)
         }, {
+            val timer = it.messageTimer
             when {
-                it.messageTimer.isPositiveNotNull() -> SelfDeletionTimer.Enforced.ByGroup(it.messageTimer)
+                timer.isPositiveNotNull() -> SelfDeletionTimer.Enforced.ByGroup(timer)
                 considerSelfUserSettings && it.userMessageTimer.isPositiveNotNull() -> SelfDeletionTimer.Enabled(it.userMessageTimer)
                 else -> SelfDeletionTimer.Enabled(null)
             }

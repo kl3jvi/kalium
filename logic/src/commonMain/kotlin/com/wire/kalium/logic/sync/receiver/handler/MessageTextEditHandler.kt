@@ -56,21 +56,22 @@ internal class MessageTextEditHandlerImpl internal constructor(
             return@flatMap Either.Left(StorageFailure.DataNotFound)
         }
 
+        val content = currentMessage.content
         if (currentMessage is Message.Regular
-            && currentMessage.content is MessageContent.Text
+            && content is MessageContent.Text
             && currentMessage.editStatus is Message.EditStatus.Edited
         ) {
             // if the locally stored message is also already edited, we check which one is newer
-            if (currentMessage.editStatus.lastEditInstant < message.date) {
+            if ((currentMessage.editStatus as Message.EditStatus.Edited).lastEditInstant < message.date) {
                 // our local pending or failed edit is newer than one we got from the backend so we update locally only message id and date
                 messageRepository.updateTextMessage(
                     conversationId = message.conversationId,
                     messageContent = messageContent.copy(
-                        newContent = currentMessage.content.value,
-                        newMentions = currentMessage.content.mentions
+                        newContent = content.value,
+                        newMentions = content.mentions
                     ),
                     newMessageId = message.id,
-                    editInstant = currentMessage.editStatus.lastEditInstant
+                    editInstant = (currentMessage.editStatus as Message.EditStatus.Edited).lastEditInstant
                 )
             } else {
                 notificationEventsManager.scheduleEditMessageNotification(message, messageContent)

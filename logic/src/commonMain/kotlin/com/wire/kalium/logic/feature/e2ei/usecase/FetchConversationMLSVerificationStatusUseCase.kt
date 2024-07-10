@@ -20,6 +20,7 @@ package com.wire.kalium.logic.feature.e2ei.usecase
 import com.wire.kalium.logic.data.conversation.Conversation
 import com.wire.kalium.logic.data.conversation.ConversationRepository
 import com.wire.kalium.logic.data.id.ConversationId
+import com.wire.kalium.logic.functional.map
 import com.wire.kalium.logic.functional.onSuccess
 
 /**
@@ -35,9 +36,9 @@ internal class FetchConversationMLSVerificationStatusUseCaseImpl(
 ) : FetchConversationMLSVerificationStatusUseCase {
 
     override suspend fun invoke(conversationId: ConversationId) {
-        conversationRepository.detailsById(conversationId).onSuccess {
-            if (it.protocol is Conversation.ProtocolInfo.MLSCapable)
-                fetchMLSVerificationStatusUseCase(it.protocol.groupId)
+        conversationRepository.detailsById(conversationId).map { it.protocol }.onSuccess { protocol ->
+            if (protocol is Conversation.ProtocolInfo.MLSCapable)
+                fetchMLSVerificationStatusUseCase(protocol.groupId)
         }
     }
 }

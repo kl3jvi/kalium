@@ -21,7 +21,6 @@ package com.wire.kalium.logic.sync.receiver.conversation.message
 import com.wire.kalium.logger.KaliumLogger.Companion.ApplicationFlow
 import com.wire.kalium.logic.data.conversation.ClientId
 import com.wire.kalium.logic.data.id.ConversationId
-import com.wire.kalium.logic.data.message.AssetContent
 import com.wire.kalium.logic.data.message.Message
 import com.wire.kalium.logic.data.message.MessageContent
 import com.wire.kalium.logic.data.message.MessageRepository
@@ -303,7 +302,3 @@ internal class ApplicationMessageHandlerImpl(
         processMessage(message)
     }
 }
-
-fun AssetContent.hasValidRemoteData() = this.remoteData.hasValidData()
-
-fun AssetContent.RemoteData.hasValidData() = assetId.isNotEmpty() && sha256.isNotEmpty() && otrKey.isNotEmpty()

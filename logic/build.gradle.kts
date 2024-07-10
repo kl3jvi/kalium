@@ -37,7 +37,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":data"))
+                api(project(":data"))
                 implementation(project(":network"))
                 api(project(":network-util"))
                 implementation(project(":cryptography"))
