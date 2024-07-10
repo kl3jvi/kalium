@@ -19,6 +19,8 @@
 
 package com.wire.kalium.logic.feature.backup
 
+import com.wire.backup.data.BackupData
+import com.wire.backup.import.MPBackupImporter
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors.INVALID_FORMAT
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors.INVALID_USER_ID
@@ -28,6 +30,8 @@ import com.wire.kalium.cryptography.utils.ChaCha20Decryptor.decryptBackupFile
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
 import com.wire.kalium.logic.data.id.CurrentClientIdProvider
 import com.wire.kalium.logic.data.id.IdMapper
+import com.wire.kalium.logic.data.message.MigratedMessage
+import com.wire.kalium.logic.data.message.PersistMessageUseCase
 import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.data.user.UserRepository
 import com.wire.kalium.logic.di.MapperProvider
@@ -79,23 +83,23 @@ internal class RestoreBackupUseCaseImpl(
     private val currentClientIdProvider: CurrentClientIdProvider,
     private val restoreWebBackup: RestoreWebBackupUseCase,
     private val dispatchers: KaliumDispatcher = KaliumDispatcherImpl,
+    private val persistMessageUseCase: PersistMessageUseCase
     private val idMapper: IdMapper = MapperProvider.idMapper()
 ) : RestoreBackupUseCase {
 
     override suspend operator fun invoke(backupFilePath: Path, password: String?): RestoreBackupResult =
         withContext(dispatchers.io) {
-            extractCompressedBackup(backupFilePath.normalized())
-                .flatMap { extractedBackupRootPath ->
-                    if (password.isNullOrEmpty()) {
-                        backupMetadata(extractedBackupRootPath)
-                            .flatMap { metadata ->
-                                importUnencryptedBackup(extractedBackupRootPath, metadata)
-                            }
-                    } else {
-                        importEncryptedBackup(extractedBackupRootPath, password)
-                    }
+            MPBackupImporter(backupFilePath.toString()).import { data ->
+                when(data) {
+                    is BackupData.Message.Text -> MigratedMessage(
+                        conversationId = data.conversationId,
+                        senderUserId = data.senderUserId,
+                        senderClientId = data.senderClientId,
+
+                    )
                 }
-                .fold({ it }, { RestoreBackupResult.Success })
+            }
+            RestoreBackupResult.Success
         }
 
     private suspend fun importUnencryptedBackup(

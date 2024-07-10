@@ -18,23 +18,31 @@
 package com.wire.backup.data
 
 import com.wire.kalium.logic.data.id.ConversationId
-import com.wire.kalium.logic.data.id.QualifiedID
+import com.wire.kalium.logic.data.user.UserId
+import kotlinx.datetime.Instant
 
 sealed interface BackupData {
-
-    data class User(
-        val id: QualifiedID,
-        val name: String,
-        val handle: String,
-    ) : BackupData
-
-    data class Conversation(val conversationId: ConversationId, val name: String) : BackupData
+//
+//     data class User(
+//         val id: QualifiedID,
+//         val name: String,
+//         val handle: String,
+//     ) : BackupData
+//
+//     data class Conversation(val conversationId: ConversationId, val name: String) : BackupData
 
     sealed interface Message : BackupData {
+        val messageId: String
+        val senderUserId: UserId
         val conversationId: ConversationId
+        val time: Instant
 
         data class Text(
+            override val messageId: String,
             override val conversationId: ConversationId,
+            override val senderUserId: UserId,
+            override val time: Instant,
+            val senderClientId: String,
             val textValue: String,
         ) : Message
     }

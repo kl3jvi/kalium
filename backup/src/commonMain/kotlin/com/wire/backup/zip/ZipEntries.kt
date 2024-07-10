@@ -18,7 +18,8 @@
 package com.wire.backup.zip
 
 internal enum class ZipEntries(val entryName: String) {
-    MESSAGES("data.json"),
-    INFO("version.json"),
-    CONVERSATIONS("conversations.json")
+    EVENTS("events.json"),
+    METADATA("export.json"),
+    CONVERSATIONS("conversations.json"),
+    USERS("users.json")
 }

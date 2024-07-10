@@ -37,6 +37,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":backup"))
                 api(project(":data"))
                 implementation(project(":network"))
                 api(project(":network-util"))

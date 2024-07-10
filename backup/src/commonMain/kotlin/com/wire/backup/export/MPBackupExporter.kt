@@ -23,6 +23,11 @@ import com.oldguy.common.io.ZipEntry
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
 import com.wire.backup.zip.ZipEntries
+import com.wire.kalium.logic.data.id.ConversationId
+import com.wire.kalium.logic.data.id.QualifiedID
+import com.wire.kalium.logic.data.web.KtxWebSerializer
+import com.wire.kalium.logic.data.web.WebEventContent
+import kotlinx.serialization.encodeToString
 
 class MPBackupExporter(exportPath: String) {
 
@@ -31,17 +36,17 @@ class MPBackupExporter(exportPath: String) {
         FileMode.Write
     )
 
-    private val allUsers = ArrayList<BackupData.User>()
-    private val allConversations = ArrayList<BackupData.Conversation>()
+//     private val allUsers = ArrayList<BackupData.User>()
+//     private val allConversations = ArrayList<BackupData.Conversation>()
     private val allMessages = ArrayList<BackupData.Message>()
 
-    fun add(user: BackupData.User) {
-        allUsers.add(user)
-    }
-
-    fun add(conversation: BackupData.Conversation) {
-        allConversations.add(conversation)
-    }
+//     fun add(user: BackupData.User) {
+//         TODO
+//     }
+//
+//     fun add(conversation: BackupData.Conversation) {
+//         TODO
+//     }
 
     fun add(message: BackupData.Message) {
         allMessages.add(message)
@@ -51,14 +56,30 @@ class MPBackupExporter(exportPath: String) {
         // TODO: maybe perform BackupData -> storage format in parallel, instead of one entry at a time.
         zipFile.use { file ->
             file.addEntry(
-                ZipEntry(ZipEntries.MESSAGES.entryName),
+                ZipEntry(ZipEntries.EVENTS.entryName),
             ) {
-                // TODO: avoid parsing to String and then to ByteArray
-                //                    Maybe we can just output in another format like Protobuf
-                //                    And buffer it so we avoid having all of this in memory
-//                     KtxWebSerializer.json.encodeToString().encodeToByteArray()
-                TODO("Map all messages to a JSON and output as a ByteArray")
+                val events: List<WebEventContent> = allMessages.map {
+                    WebEventContent.Conversation.TextMessage(
+                        it.conversationId, it.
+                    )
+                }
+                KtxWebSerializer.json.encodeToString(events).encodeToByteArray()
             }
         }
+    }
+}
+
+
+suspend fun example() {
+    // App code:
+    backupUseCase.invoke(Context.getFile("backup.zip"))
+
+    // Inside the UseCase:
+    MPBackupExporter("backup.zip").apply {
+        repository.getAll().forEach {
+            add(BackupData.User(QualifiedID("", "asod"), "Name", "handle"))
+            add(BackupData.Message.Text(ConversationId("asd", "asd"), "Hello!!!"))
+        }
+        flushToFile()
     }
 }
