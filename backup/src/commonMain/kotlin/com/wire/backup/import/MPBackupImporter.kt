@@ -17,7 +17,38 @@
  */
 package com.wire.backup.import
 
-class MPBackupImporter(val pathToFile: String) {
+import com.oldguy.common.io.File
+import com.oldguy.common.io.FileMode
+import com.oldguy.common.io.ZipFile
+import com.wire.backup.data.BackupData
+import com.wire.backup.zip.ZipEntries
 
-    fun import(onDataImported: (BackupData))
+class MPBackupImporter(pathToFile: String) {
+
+    private val zipFile = ZipFile(
+        File(pathToFile),
+        FileMode.Read
+    )
+
+    suspend fun import(onDataImported: (BackupData) -> Unit) {
+
+        zipFile.readEntry(ZipEntries.INFO.entryName) { entry, content, count, isLast ->
+
+        }
+        zipFile.useEntries { entry ->
+            when (entry.name) {
+                ZipEntries.MESSAGES.entryName -> {
+
+                }
+
+                ZipEntries.INFO.entryName -> {
+
+                }
+
+                ZipEntries.CONVERSATIONS.entryName -> {
+
+                }
+            }
+        }
+    }
 }

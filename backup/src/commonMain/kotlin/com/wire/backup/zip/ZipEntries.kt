@@ -15,5 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
+package com.wire.backup.zip
 
-fun main() = println("Hello, dear!")
+internal enum class ZipEntries(val entryName: String) {
+    MESSAGES("data.json"),
+    INFO("version.json"),
+    CONVERSATIONS("conversations.json")
+}

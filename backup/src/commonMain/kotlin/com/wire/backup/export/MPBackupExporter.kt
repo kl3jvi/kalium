@@ -22,6 +22,7 @@ import com.oldguy.common.io.FileMode
 import com.oldguy.common.io.ZipEntry
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
+import com.wire.backup.zip.ZipEntries
 
 class MPBackupExporter(exportPath: String) {
 
@@ -50,7 +51,7 @@ class MPBackupExporter(exportPath: String) {
         // TODO: maybe perform BackupData -> storage format in parallel, instead of one entry at a time.
         zipFile.use { file ->
             file.addEntry(
-                ZipEntry("messages.json"),
+                ZipEntry(ZipEntries.MESSAGES.entryName),
             ) {
                 // TODO: avoid parsing to String and then to ByteArray
                 //                    Maybe we can just output in another format like Protobuf
