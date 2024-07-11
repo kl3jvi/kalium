@@ -96,7 +96,7 @@ internal class RestoreBackupUseCaseImpl(
     override suspend operator fun invoke(backupFilePath: Path, password: String?): RestoreBackupResult =
         withContext(dispatchers.io) {
             val messages = mutableListOf<MigratedMessage>()
-            MPBackupImporter(backupFilePath.toString()).import { data ->
+            MPBackupImporter(backupFilePath.toString(), userId.domain).import { data ->
                 when (data) {
                     is BackupData.Conversation -> {}
                     is BackupData.Message.Text -> messages.add(data.toMigratedMessage())

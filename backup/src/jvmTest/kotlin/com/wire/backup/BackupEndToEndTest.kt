@@ -53,7 +53,7 @@ class BackupEndToEndTest {
         }
 
         val restoredMessages = mutableListOf<BackupData.Message>()
-        MPBackupImporter(targetFile.path).import { importedData ->
+        MPBackupImporter(targetFile.path, "selfDomain").import { importedData ->
             when (importedData) {
                 is BackupData.Message -> restoredMessages.add(importedData)
                 is BackupData.Conversation -> {}

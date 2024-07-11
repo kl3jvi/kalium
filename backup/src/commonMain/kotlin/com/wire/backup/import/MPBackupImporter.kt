@@ -22,12 +22,13 @@ import com.oldguy.common.io.FileMode
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
 import com.wire.backup.zip.ZipEntries
+import com.wire.kalium.logic.data.id.QualifiedID
 import com.wire.kalium.logic.data.web.KtxWebSerializer
 import com.wire.kalium.logic.data.web.WebEventContent
 import kotlinx.datetime.Instant
 import okio.Buffer
 
-class MPBackupImporter(pathToFile: String) {
+class MPBackupImporter(pathToFile: String, val selfUserDomain: String) {
 
     private val zipFile = ZipFile(
         File(pathToFile),
@@ -59,9 +60,9 @@ class MPBackupImporter(pathToFile: String) {
                 is WebEventContent.Conversation.TextMessage -> BackupData.Message.Text(
                     messageId = webEvent.id,
                     conversationId = webEvent.qualifiedConversation,
-                    senderUserId = webEvent.qualifiedFrom!!, // TODO: Bang bang!
+                    senderUserId = webEvent.qualifiedFrom ?: QualifiedID(webEvent.from, selfUserDomain), // TODO: Bang bang!
                     time = Instant.parse(webEvent.time),
-                    senderClientId = webEvent.fromClientId!!, // TODO: Bang bang!
+                    senderClientId = webEvent.fromClientId.orEmpty(),
                     textValue = webEvent.data.text
                 )
 
