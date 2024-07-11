@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-package com.wire.kalium.logic.feature.backup
+package com.wire.backup.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -18,6 +18,7 @@
 package com.wire.backup
 
 import com.wire.backup.data.BackupData
+import com.wire.backup.data.BackupMetadata
 import com.wire.backup.export.MPBackupExporter
 import com.wire.backup.import.MPBackupImporter
 import com.wire.kalium.logic.data.id.ConversationId
@@ -46,7 +47,7 @@ class BackupEndToEndTest {
             "clientId",
             "Hello from the backup!"
         )
-        MPBackupExporter(targetFile.path).apply {
+        MPBackupExporter(targetFile.path, metaBackupData).apply {
             add(expectedMessage)
             flushToFile()
         }
@@ -55,8 +56,20 @@ class BackupEndToEndTest {
         MPBackupImporter(targetFile.path).import { importedData ->
             when (importedData) {
                 is BackupData.Message -> restoredMessages.add(importedData)
+                is BackupData.Conversation -> {}
             }
         }
         assertContentEquals(listOf(expectedMessage), restoredMessages)
+    }
+
+
+    companion object {
+        private val metaBackupData = BackupMetadata(
+            platform = "Android",
+            version = "21",
+            "userId",
+            creationTime = "2024-07-10T14:46:21.723Z",
+            clientId = "clientId"
+        )
     }
 }

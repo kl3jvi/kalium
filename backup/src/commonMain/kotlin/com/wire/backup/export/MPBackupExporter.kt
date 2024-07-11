@@ -22,14 +22,18 @@ import com.oldguy.common.io.FileMode
 import com.oldguy.common.io.ZipEntry
 import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
+import com.wire.backup.data.BackupMetadata
 import com.wire.backup.zip.ZipEntries
+import com.wire.kalium.logic.data.conversation.Conversation
 import com.wire.kalium.logic.data.web.KtxWebSerializer
 import com.wire.kalium.logic.data.web.WebEventContent
 import com.wire.kalium.logic.data.web.WebTextData
+import com.wire.kalium.logic.data.web.toWebConversationContent
 import kotlinx.serialization.encodeToString
 import okio.Buffer
 
-class MPBackupExporter(exportPath: String) {
+class MPBackupExporter(exportPath: String, val metaData: BackupMetadata) {
+
 
     private val zipFile = ZipFile(
         File(exportPath),
@@ -37,16 +41,16 @@ class MPBackupExporter(exportPath: String) {
     )
 
     //     private val allUsers = ArrayList<BackupData.User>()
-//     private val allConversations = ArrayList<BackupData.Conversation>()
+    private val allConversations = ArrayList<Conversation>()
     private val allMessages = ArrayList<BackupData.Message>()
 
 //     fun add(user: BackupData.User) {
 //         TODO
 //     }
 //
-//     fun add(conversation: BackupData.Conversation) {
-//         TODO
-//     }
+    fun add(conversation: Conversation) {
+        allConversations.add(conversation)
+    }
 
     fun add(message: BackupData.Message) {
         allMessages.add(message)
@@ -54,29 +58,49 @@ class MPBackupExporter(exportPath: String) {
 
     suspend fun flushToFile() {
         // TODO: maybe perform BackupData -> storage format in parallel, instead of one entry at a time.
+        println("KBX allMessages size ${allMessages.size}")
         val events: List<WebEventContent> = allMessages.map {
             when (it) {
                 is BackupData.Message.Text -> {
                     WebEventContent.Conversation.TextMessage(
                         qualifiedConversation = it.conversationId,
+                        conversation = it.conversationId.value,
                         qualifiedFrom = it.senderUserId,
                         from = it.senderUserId.value,
                         fromClientId = it.senderClientId,
                         time = it.time.toString(),
                         id = it.messageId,
                         data = WebTextData(it.textValue, false, 0),
-                        reactions = null
+                        reactions = null,
+                        category = 16,
                     )
                 }
             }
         }
-        val outputBuffer = Buffer()
-        outputBuffer.write(KtxWebSerializer.json.encodeToString(events).encodeToByteArray())
+
+        val conversations = allConversations.map { it.toWebConversationContent() }
+        val metaDataBuffer = Buffer()
+        metaDataBuffer.write(KtxWebSerializer.json.encodeToString(metaData).encodeToByteArray())
+        val eventsBuffer = Buffer()
+        eventsBuffer.write(KtxWebSerializer.json.encodeToString(events).encodeToByteArray())
+        val conversationBuffer = Buffer()
+        conversationBuffer.write(KtxWebSerializer.json.encodeToString(conversations).encodeToByteArray())
+
         zipFile.use { file ->
+            file.addEntry(
+                ZipEntry(ZipEntries.METADATA.entryName)
+            ) {
+                metaDataBuffer.readByteArray()
+            }
             file.addEntry(
                 ZipEntry(ZipEntries.EVENTS.entryName),
             ) {
-                outputBuffer.readByteArray()
+                eventsBuffer.readByteArray()
+            }
+            file.addEntry(
+                ZipEntry(ZipEntries.CONVERSATIONS.entryName),
+            ) {
+                conversationBuffer.readByteArray()
             }
         }
     }

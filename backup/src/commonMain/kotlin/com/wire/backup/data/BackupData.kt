@@ -29,7 +29,7 @@ sealed interface BackupData {
 //         val handle: String,
 //     ) : BackupData
 //
-//     data class Conversation(val conversationId: ConversationId, val name: String) : BackupData
+    data class Conversation(val conversationId: ConversationId, val name: String) : BackupData
 
     sealed interface Message : BackupData {
         val messageId: String

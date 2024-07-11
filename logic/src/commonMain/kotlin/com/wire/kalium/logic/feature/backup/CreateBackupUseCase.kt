@@ -19,6 +19,9 @@
 
 package com.wire.kalium.logic.feature.backup
 
+import com.wire.backup.data.BackupData
+import com.wire.backup.data.BackupMetadata
+import com.wire.backup.export.MPBackupExporter
 import com.wire.kalium.cryptography.backup.BackupCoder
 import com.wire.kalium.cryptography.backup.Passphrase
 import com.wire.kalium.cryptography.utils.ChaCha20Encryptor.encryptBackupFile
@@ -26,11 +29,16 @@ import com.wire.kalium.logic.CoreFailure
 import com.wire.kalium.logic.StorageFailure
 import com.wire.kalium.logic.clientPlatform
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
+import com.wire.kalium.logic.data.conversation.ConversationRepository
 import com.wire.kalium.logic.data.id.IdMapper
 import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.data.user.UserRepository
 import com.wire.kalium.logic.di.MapperProvider
 import com.wire.kalium.logic.data.id.CurrentClientIdProvider
+import com.wire.kalium.logic.data.id.QualifiedID
+import com.wire.kalium.logic.data.message.Message
+import com.wire.kalium.logic.data.message.MessageContent
+import com.wire.kalium.logic.data.message.MessageRepository
 import com.wire.kalium.logic.feature.backup.BackupConstants.BACKUP_ENCRYPTED_FILE_NAME
 import com.wire.kalium.logic.feature.backup.BackupConstants.BACKUP_METADATA_FILE_NAME
 import com.wire.kalium.logic.feature.backup.BackupConstants.BACKUP_USER_DB_NAME
@@ -38,6 +46,7 @@ import com.wire.kalium.logic.feature.backup.BackupConstants.createBackupFileName
 import com.wire.kalium.logic.functional.Either
 import com.wire.kalium.logic.functional.flatMap
 import com.wire.kalium.logic.functional.fold
+import com.wire.kalium.logic.functional.getOrNull
 import com.wire.kalium.logic.functional.nullableFold
 import com.wire.kalium.logic.kaliumLogger
 import com.wire.kalium.logic.util.SecurityHelper
@@ -46,12 +55,12 @@ import com.wire.kalium.persistence.backup.DatabaseExporter
 import com.wire.kalium.util.DateTimeUtil
 import com.wire.kalium.util.KaliumDispatcher
 import com.wire.kalium.util.KaliumDispatcherImpl
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okio.FileNotFoundException
 import okio.Path
-import okio.Path.Companion.toPath
 import okio.Sink
 import okio.Source
 import okio.buffer
@@ -76,6 +85,8 @@ internal class CreateBackupUseCaseImpl(
     private val securityHelper: SecurityHelper,
     private val dispatchers: KaliumDispatcher = KaliumDispatcherImpl,
     private val idMapper: IdMapper = MapperProvider.idMapper(),
+    private val messageRepository: MessageRepository,
+    private val conversationRepository: ConversationRepository,
 ) : CreateBackupUseCase {
 
     override suspend operator fun invoke(password: String): CreateBackupResult = withContext(dispatchers.default) {
@@ -84,23 +95,77 @@ internal class CreateBackupUseCaseImpl(
         val backupName = createBackupFileName(userHandle, timeStamp)
         val backupFilePath = kaliumFileSystem.tempFilePath(backupName)
         deletePreviousBackupFiles(backupFilePath)
+        val clientId = clientIdProvider().nullableFold({ null }, { it.value })
 
-        val plainDBPath =
-            databaseExporter.exportToPlainDB(securityHelper.userDBOrSecretNull(userId))?.toPath()
-                ?: return@withContext CreateBackupResult.Failure(StorageFailure.DataNotFound)
+        val exporter = MPBackupExporter(backupFilePath.toString(),
+            metaData = BackupMetadata(
+                platform = "Web", // TODO check if web handle android
+                version = "21",
+                userId.value,
+                creationTime = timeStamp,
+                clientId = clientId
+            )
+        )
 
-        try {
-            createBackupFile(userId, plainDBPath, backupFilePath).fold(
-                { error -> CreateBackupResult.Failure(error) },
-                { (backupFilePath, backupSize) ->
-                    val isBackupEncrypted = password.isNotEmpty()
-                    if (isBackupEncrypted) {
-                        encryptAndCompressFile(backupFilePath, password)
-                    } else CreateBackupResult.Success(backupFilePath, backupSize, backupFilePath.name)
-                })
-        } finally {
-            databaseExporter.deleteBackupDBFile()
+        val conversationId =
+            QualifiedID("926b62b4-a639-411b-a511-d31d0217ac0c", "wire.com")
+        messageRepository.getMessagesByConversationIdAndVisibility(
+            conversationId, 100, 0,
+            listOf(Message.Visibility.VISIBLE)
+        ).firstOrNull()?.let { messageList ->
+            messageList.forEach { message ->
+                when (message) {
+                    is Message.Regular -> when (message.content) {
+                        is MessageContent.Text -> exporter.add(
+                            BackupData.Message.Text(
+                                messageId = message.id,
+                                conversationId = conversationId,
+                                time = message.date,
+                                textValue = (message.content as MessageContent.Text).value,
+                                senderUserId = message.senderUserId,
+                                senderClientId = message.senderClientId.value,
+                            )
+                        )
+
+                        else -> {}
+                    }
+
+                    else -> {
+
+                    }
+                }
+
+            }
         }
+
+        conversationRepository.getConversationList().getOrNull()?.firstOrNull()?.let { conversationList ->
+            conversationList.forEach {
+                exporter.add(it)
+            }
+        }
+
+
+        exporter.flushToFile()
+
+//         val plainDBPath =
+//             databaseExporter.exportToPlainDB(securityHelper.userDBOrSecretNull(userId))?.toPath()
+//                 ?: return@withContext CreateBackupResult.Failure(StorageFailure.DataNotFound)
+//
+//         try {
+//             createBackupFile(userId, plainDBPath, backupFilePath).fold(
+//                 { error -> CreateBackupResult.Failure(error) },
+//                 { (backupFilePath, backupSize) ->
+//                     val isBackupEncrypted = password.isNotEmpty()
+//                     if (isBackupEncrypted) {
+//                         encryptAndCompressFile(backupFilePath, password)
+//                     } else CreateBackupResult.Success(backupFilePath, backupSize, backupFilePath.name)
+//                 })
+//         } finally {
+//             databaseExporter.deleteBackupDBFile()
+//         }
+
+        println("KBX backupFilePath ${backupFilePath}")
+        CreateBackupResult.Success(backupFilePath, 20_000, backupName)
     }
 
     private suspend fun encryptAndCompressFile(backupFilePath: Path, password: String): CreateBackupResult {

@@ -19,7 +19,7 @@
 
 package com.wire.kalium.logic.feature.backup
 
-import com.wire.backup.import.MPBackupImporter
+import com.wire.backup.data.BackupMetadata
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
 import com.wire.kalium.logic.data.conversation.Conversation
 import com.wire.kalium.logic.data.conversation.ConversationMapper
@@ -87,10 +87,6 @@ internal class RestoreWebBackupUseCaseImpl(
         filePath: Path,
         coroutineScope: CoroutineScope
     ): Either<RestoreBackupResult.BackupRestoreFailure, Unit> {
-        val gello = MPBackupImporter("somePath")
-        gello.import { data ->
-
-        }
         return importMessages(filePath, coroutineScope)
             .map { tryImportConversations(filePath) }
     }

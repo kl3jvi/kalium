@@ -20,6 +20,8 @@
 package com.wire.kalium.logic.feature.backup
 
 import com.wire.backup.data.BackupData
+import com.wire.backup.data.BackupMetadata
+import com.wire.backup.data.isWebBackup
 import com.wire.backup.import.MPBackupImporter
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors.INVALID_FORMAT
@@ -28,10 +30,13 @@ import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors.INV
 import com.wire.kalium.cryptography.backup.Passphrase
 import com.wire.kalium.cryptography.utils.ChaCha20Decryptor.decryptBackupFile
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
+import com.wire.kalium.logic.data.conversation.ClientId
+import com.wire.kalium.logic.data.conversation.Conversation
 import com.wire.kalium.logic.data.id.CurrentClientIdProvider
 import com.wire.kalium.logic.data.id.IdMapper
+import com.wire.kalium.logic.data.message.MessageContent
 import com.wire.kalium.logic.data.message.MigratedMessage
-import com.wire.kalium.logic.data.message.PersistMessageUseCase
+import com.wire.kalium.logic.data.message.ProtoContent
 import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.data.user.UserRepository
 import com.wire.kalium.logic.di.MapperProvider
@@ -43,6 +48,7 @@ import com.wire.kalium.logic.feature.backup.RestoreBackupResult.BackupRestoreFai
 import com.wire.kalium.logic.feature.backup.RestoreBackupResult.BackupRestoreFailure.IncompatibleBackup
 import com.wire.kalium.logic.feature.backup.RestoreBackupResult.BackupRestoreFailure.InvalidUserId
 import com.wire.kalium.logic.feature.backup.RestoreBackupResult.Failure
+import com.wire.kalium.logic.feature.message.PersistMigratedMessagesUseCase
 import com.wire.kalium.logic.functional.Either
 import com.wire.kalium.logic.functional.flatMap
 import com.wire.kalium.logic.functional.fold
@@ -82,23 +88,22 @@ internal class RestoreBackupUseCaseImpl(
     private val userRepository: UserRepository,
     private val currentClientIdProvider: CurrentClientIdProvider,
     private val restoreWebBackup: RestoreWebBackupUseCase,
+    private val persistMigratedMessages: PersistMigratedMessagesUseCase,
     private val dispatchers: KaliumDispatcher = KaliumDispatcherImpl,
-    private val persistMessageUseCase: PersistMessageUseCase
     private val idMapper: IdMapper = MapperProvider.idMapper()
 ) : RestoreBackupUseCase {
 
     override suspend operator fun invoke(backupFilePath: Path, password: String?): RestoreBackupResult =
         withContext(dispatchers.io) {
+            val messages = mutableListOf<MigratedMessage>()
             MPBackupImporter(backupFilePath.toString()).import { data ->
-                when(data) {
-                    is BackupData.Message.Text -> MigratedMessage(
-                        conversationId = data.conversationId,
-                        senderUserId = data.senderUserId,
-                        senderClientId = data.senderClientId,
-
-                    )
+                when (data) {
+                    is BackupData.Conversation -> {}
+                    is BackupData.Message.Text -> messages.add(data.toMigratedMessage())
                 }
+
             }
+            persistMigratedMessages(messages, this)
             RestoreBackupResult.Success
         }
 
@@ -258,3 +263,30 @@ internal class RestoreBackupUseCaseImpl(
 }
 
 private const val EXTRACTED_FILES_PATH = "extractedFiles"
+
+
+private fun BackupData.Message.toMigratedMessage(): MigratedMessage = when (this) {
+    is BackupData.Message.Text -> MigratedMessage(
+        conversationId = conversationId,
+        senderUserId = senderUserId,
+        senderClientId = ClientId(senderClientId),
+        timestamp = time.toEpochMilliseconds(),
+        content = "",
+        unencryptedProto = ProtoContent.Readable(
+            messageId,
+            MessageContent.Text(
+                textValue,
+            ),
+            expectsReadConfirmation = false, //   data.expectsReadConfirmation ?: false,
+            legalHoldStatus =
+//                 if (data.legalHoldStatus == 2) Conversation.LegalHoldStatus.ENABLED
+//                 else
+            Conversation.LegalHoldStatus.DISABLED
+        ),
+        encryptedProto = null,
+        null,
+        null,
+        null
+    )
+}
+

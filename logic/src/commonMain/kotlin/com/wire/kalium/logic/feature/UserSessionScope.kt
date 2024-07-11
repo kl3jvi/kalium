@@ -842,6 +842,8 @@ class UserSessionScope internal constructor(
             userStorage,
             persistMigratedMessage,
             restartSlowSyncProcessForRecoveryUseCase,
+            messageRepository,
+            conversationRepository,
             globalPreferences,
         )
 

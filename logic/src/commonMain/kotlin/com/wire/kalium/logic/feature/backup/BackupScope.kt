@@ -20,10 +20,12 @@
 package com.wire.kalium.logic.feature.backup
 
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
+import com.wire.kalium.logic.data.conversation.ConversationRepository
 import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.data.user.UserRepository
 import com.wire.kalium.logic.di.UserStorage
 import com.wire.kalium.logic.data.id.CurrentClientIdProvider
+import com.wire.kalium.logic.data.message.MessageRepository
 import com.wire.kalium.logic.feature.message.PersistMigratedMessagesUseCase
 import com.wire.kalium.logic.sync.slow.RestartSlowSyncProcessForRecoveryUseCase
 import com.wire.kalium.logic.util.SecurityHelperImpl
@@ -38,6 +40,8 @@ class BackupScope internal constructor(
     private val userStorage: UserStorage,
     private val persistMigratedMessages: PersistMigratedMessagesUseCase,
     private val restartSlowSyncProcessForRecovery: RestartSlowSyncProcessForRecoveryUseCase,
+    private val messageRepository: MessageRepository,
+    private val conversationRepository: ConversationRepository,
     val globalPreferences: GlobalPrefProvider,
 ) {
     val create: CreateBackupUseCase
@@ -47,7 +51,9 @@ class BackupScope internal constructor(
             userRepository,
             kaliumFileSystem,
             userStorage.database.databaseExporter,
-            securityHelper = SecurityHelperImpl(globalPreferences.passphraseStorage)
+            securityHelper = SecurityHelperImpl(globalPreferences.passphraseStorage),
+            messageRepository = messageRepository,
+            conversationRepository = conversationRepository
         )
 
     val verify: VerifyBackupUseCase
@@ -69,7 +75,8 @@ class BackupScope internal constructor(
             userId,
             userRepository,
             clientIdProvider,
-            restoreWeb
+            restoreWeb,
+            persistMigratedMessages
         )
 
 }

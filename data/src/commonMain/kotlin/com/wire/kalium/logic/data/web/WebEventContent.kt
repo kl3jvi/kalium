@@ -58,12 +58,14 @@ sealed interface WebEventContent {
     @Serializable
     sealed interface Conversation : WebEventContent {
         val qualifiedConversation: ConversationId
+        val conversation: String
         val qualifiedFrom: UserId?
 
         @Serializable
         @SerialName("conversation.group-creation")
         data class NewGroup(
             @SerialName("qualified_conversation") override val qualifiedConversation: ConversationId,
+            @SerialName("conversation") override val conversation: String,
             @SerialName("qualified_from") override val qualifiedFrom: UserId?,
             @SerialName("from") val from: String,
             @SerialName("data") val members: WebGroupMembers,
@@ -74,19 +76,22 @@ sealed interface WebEventContent {
         @SerialName("conversation.message-add")
         data class TextMessage(
             @SerialName("qualified_conversation") override val qualifiedConversation: ConversationId,
+            @SerialName("conversation") override val conversation: String,
             @SerialName("qualified_from") override val qualifiedFrom: UserId?,
             @SerialName("from") val from: String,
             @SerialName("from_client_id") val fromClientId: String?,
             @SerialName("time") val time: String,
             @SerialName("id") val id: String,
             @SerialName("data") val data: WebTextData,
-            @SerialName("reactions") val reactions: Map<String, String>?
+            @SerialName("reactions") val reactions: Map<String, String>?,
+            @SerialName("category") val category: Int? // 16 ?
         ) : Conversation
 
         @Serializable
         @SerialName("conversation.asset-add")
         data class AssetMessage(
             @SerialName("qualified_conversation") override val qualifiedConversation: ConversationId,
+            @SerialName("conversation") override val conversation: String,
             @SerialName("qualified_from") override val qualifiedFrom: UserId?,
             @SerialName("from") val from: String,
             @SerialName("from_client_id") val fromClientId: String?,
@@ -100,6 +105,7 @@ sealed interface WebEventContent {
         @SerialName("conversation.knock")
         data class KnockMessage(
             @SerialName("qualified_conversation") override val qualifiedConversation: ConversationId,
+            @SerialName("conversation") override val conversation: String,
             @SerialName("qualified_from") override val qualifiedFrom: UserId?,
             @SerialName("from") val from: String,
             @SerialName("from_client_id") val fromClientId: String,

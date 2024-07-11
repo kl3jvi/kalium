@@ -18,6 +18,7 @@
 
 package com.wire.kalium.logic.feature.backup
 
+import com.wire.backup.data.BackupMetadata
 import com.wire.kalium.logic.data.asset.FakeKaliumFileSystem
 import com.wire.kalium.logic.data.user.UserId
 import com.wire.kalium.logic.feature.message.PersistMigratedMessagesUseCase
@@ -31,7 +32,6 @@ import io.mockative.coEvery
 import io.mockative.coVerify
 import io.mockative.mock
 import io.mockative.once
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
