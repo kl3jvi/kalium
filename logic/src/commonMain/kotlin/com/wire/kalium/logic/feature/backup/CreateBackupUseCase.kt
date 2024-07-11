@@ -107,40 +107,37 @@ internal class CreateBackupUseCaseImpl(
             )
         )
 
-        val conversationId =
-            QualifiedID("926b62b4-a639-411b-a511-d31d0217ac0c", "wire.com")
-        messageRepository.getMessagesByConversationIdAndVisibility(
-            conversationId, 100, 0,
-            listOf(Message.Visibility.VISIBLE)
-        ).firstOrNull()?.let { messageList ->
-            messageList.forEach { message ->
-                when (message) {
-                    is Message.Regular -> when (message.content) {
-                        is MessageContent.Text -> exporter.add(
-                            BackupData.Message.Text(
-                                messageId = message.id,
-                                conversationId = conversationId,
-                                time = message.date,
-                                textValue = (message.content as MessageContent.Text).value,
-                                senderUserId = message.senderUserId,
-                                senderClientId = message.senderClientId.value,
-                            )
-                        )
+        conversationRepository.getConversationList().getOrNull()?.firstOrNull()?.let { conversationList ->
+            conversationList.forEach { conversation ->
+                messageRepository.getMessagesByConversationIdAndVisibility(
+                    conversation.id, 100, 0,
+                    listOf(Message.Visibility.VISIBLE)
+                ).firstOrNull()?.let { messageList ->
+                    messageList.forEach { message ->
+                        when (message) {
+                            is Message.Regular -> when (message.content) {
+                                is MessageContent.Text -> exporter.add(
+                                    BackupData.Message.Text(
+                                        messageId = message.id,
+                                        conversationId = conversation.id,
+                                        time = message.date,
+                                        textValue = (message.content as MessageContent.Text).value,
+                                        senderUserId = message.senderUserId,
+                                        senderClientId = message.senderClientId.value,
+                                    )
+                                )
 
-                        else -> {}
-                    }
+                                else -> {}
+                            }
 
-                    else -> {
+                            else -> {
+
+                            }
+                        }
 
                     }
                 }
-
-            }
-        }
-
-        conversationRepository.getConversationList().getOrNull()?.firstOrNull()?.let { conversationList ->
-            conversationList.forEach {
-                exporter.add(it)
+                exporter.add(conversation)
             }
         }
 
