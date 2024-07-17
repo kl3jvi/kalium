@@ -907,11 +907,12 @@ class UserSessionScope internal constructor(
             kaliumFileSystem = kaliumFileSystem
         )
 
-    private val eventGatherer: EventGatherer get() = EventGathererImpl(
-        eventRepository,
-        incrementalSyncRepository,
-        userScopedLogger,
-    )
+    private val eventGatherer: EventGatherer
+        get() = EventGathererImpl(
+            eventRepository,
+            incrementalSyncRepository,
+            userScopedLogger,
+        )
 
     private val eventProcessor: EventProcessor by lazy {
         EventProcessorImpl(
@@ -1948,8 +1949,8 @@ class UserSessionScope internal constructor(
             selfTeamId
         )
 
-    val calls: CallsScope
-        get() = CallsScope(
+    val calls: CallsScope by lazy {
+        CallsScope(
             callManager,
             callRepository,
             conversationRepository,
@@ -1963,6 +1964,7 @@ class UserSessionScope internal constructor(
             conversationClientsInCallUpdater,
             kaliumConfigs
         )
+    }
 
     val connection: ConnectionScope
         get() = ConnectionScope(
