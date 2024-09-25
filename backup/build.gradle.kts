@@ -41,12 +41,13 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":data"))
+                implementation(project(":protobuf"))
+                implementation(libs.pbandk.runtime.common)
 
                 implementation(libs.ktor.utils)
                 implementation(libs.coroutines.core)
                 implementation(libs.ktxDateTime)
                 implementation(libs.ktxSerialization)
-                implementation(libs.ktxSerialization.protobuf)
                 implementation(libs.ktor.serialization)
 
                 implementation(libs.kmpIo)
@@ -57,6 +58,31 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.coroutines.test)
+            }
+        }
+        val iosX64Main by getting {
+            dependencies {
+                implementation(libs.pbandk.runtime.iosX64)
+            }
+        }
+        val iosArm64Main by getting {
+            dependencies {
+                implementation(libs.pbandk.runtime.iosArm64)
+            }
+        }
+        val iosSimulatorArm64Main by getting {
+            dependencies {
+                implementation(libs.pbandk.runtime.iosSimulatorArm64)
+            }
+        }
+        val macosX64Main by getting {
+            dependencies {
+                implementation(libs.pbandk.runtime.macX64)
+            }
+        }
+        val macosArm64Main by getting {
+            dependencies {
+                implementation(libs.pbandk.runtime.macArm64)
             }
         }
     }

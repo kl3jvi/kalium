@@ -17,16 +17,15 @@
  */
 package com.wire.backup.import
 
-import com.wire.backup.data.BackupData
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
+import com.wire.kalium.protobuf.backup.BackupData
+import pbandk.decodeFromByteArray
 
 class MPBackupImporter(val selfUserDomain: String) {
 
-    @OptIn(ExperimentalSerializationApi::class)
+    @OptIn(ExperimentalStdlibApi::class)
     fun import(data: ByteArray): BackupImportResult = try {
-        BackupImportResult.Success(ProtoBuf.decodeFromByteArray<BackupData>(data))
+        println("!!!BACKUP: ${data.toHexString()}")
+        BackupImportResult.Success(BackupData.decodeFromByteArray(data))
     } catch (_: Exception) {
         BackupImportResult.ParsingFailure
     }

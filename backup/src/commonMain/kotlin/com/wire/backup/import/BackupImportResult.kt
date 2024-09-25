@@ -17,7 +17,7 @@
  */
 package com.wire.backup.import
 
-import com.wire.backup.data.BackupData
+import com.wire.kalium.protobuf.backup.BackupData
 
 sealed interface BackupImportResult {
     data object ParsingFailure : BackupImportResult

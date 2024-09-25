@@ -37,7 +37,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Test
 
-class OnMuteStateForSelfUserChangedTest {
+class OnMuteStateForSelfExportUserChangedTest {
 
     @Test
     fun givenNoOngoingCall_whenMuteStateCallbackHappens_thenNothingToDo() = runTest(testScope) {

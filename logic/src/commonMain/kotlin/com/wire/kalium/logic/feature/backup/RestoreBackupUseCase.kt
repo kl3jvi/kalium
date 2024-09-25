@@ -19,9 +19,7 @@
 
 package com.wire.kalium.logic.feature.backup
 
-import com.wire.backup.data.BackupData
-import com.wire.backup.data.BackupMetadata
-import com.wire.backup.data.isWebBackup
+import com.wire.backup.import.BackupImportResult
 import com.wire.backup.import.MPBackupImporter
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors
 import com.wire.kalium.cryptography.backup.BackupHeader.HeaderDecodingErrors.INVALID_FORMAT
@@ -32,6 +30,7 @@ import com.wire.kalium.cryptography.utils.ChaCha20Decryptor.decryptBackupFile
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
 import com.wire.kalium.logic.data.conversation.ClientId
 import com.wire.kalium.logic.data.conversation.Conversation
+import com.wire.kalium.logic.data.id.ConversationId
 import com.wire.kalium.logic.data.id.CurrentClientIdProvider
 import com.wire.kalium.logic.data.id.IdMapper
 import com.wire.kalium.logic.data.message.MessageContent
@@ -59,10 +58,13 @@ import com.wire.kalium.logic.util.extractCompressedFile
 import com.wire.kalium.logic.wrapStorageRequest
 import com.wire.kalium.network.tools.KtxSerializer
 import com.wire.kalium.persistence.backup.DatabaseImporter
+import com.wire.kalium.protobuf.backup.BackupInfo
+import com.wire.kalium.protobuf.backup.ExportedMessage
 import com.wire.kalium.util.DateTimeUtil
 import com.wire.kalium.util.KaliumDispatcher
 import com.wire.kalium.util.KaliumDispatcherImpl
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerializationException
 import okio.Path
 import okio.Source
@@ -95,24 +97,25 @@ internal class RestoreBackupUseCaseImpl(
 
     override suspend operator fun invoke(backupFilePath: Path, password: String?): RestoreBackupResult =
         withContext(dispatchers.io) {
-            val messages = mutableListOf<MigratedMessage>()
-            MPBackupImporter(backupFilePath.toString(), userId.domain).import { data ->
-                when (data) {
-                    is BackupData.Conversation -> {}
-                    is BackupData.Message.Text -> messages.add(data.toMigratedMessage())
+            val backupData = kaliumFileSystem.source(backupFilePath).buffer().readByteArray()
+            when (val result = MPBackupImporter(userId.domain).import(backupData)) {
+                BackupImportResult.ParsingFailure -> {
+                    Failure(IncompatibleBackup("Oopsie Doopsie! Backup format is not supported"))
                 }
 
+                is BackupImportResult.Success -> {
+                    persistMigratedMessages(result.backupData.messages.map { it.toMigratedMessage() }, this)
+                    RestoreBackupResult.Success
+                }
             }
-            persistMigratedMessages(messages, this)
-            RestoreBackupResult.Success
         }
 
     private suspend fun importUnencryptedBackup(
         extractedBackupRootPath: Path,
-        metadata: BackupMetadata,
+        metadata: BackupInfo,
     ): Either<Failure, Unit> = isValidBackupAuthor(metadata)
         .flatMap { metaData ->
-            if (metaData.isWebBackup()) {
+            if (metaData.platform == "Web") {
                 return when (val webBackup = restoreWebBackup(extractedBackupRootPath, metaData)) {
                     is Failure -> Either.Left(webBackup)
                     RestoreBackupResult.Success -> Either.Right(Unit)
@@ -234,7 +237,7 @@ internal class RestoreBackupUseCaseImpl(
     private suspend fun getBackupDBPath(extractedBackupRootFilesPath: Path): Path? =
         kaliumFileSystem.listDirectories(extractedBackupRootFilesPath).firstOrNull { it.name.contains(".db") }
 
-    private suspend fun backupMetadata(extractedBackupPath: Path): Either<Failure, BackupMetadata> =
+    private suspend fun backupMetadata(extractedBackupPath: Path): Either<Failure, BackupInfo> =
         kaliumFileSystem.listDirectories(extractedBackupPath)
             .firstOrNull { it.name == BackupConstants.BACKUP_METADATA_FILE_NAME }
             .let { it ?: return Either.Left(Failure(IncompatibleBackup("backupMetadata: No metadata file found"))) }
@@ -247,15 +250,15 @@ internal class RestoreBackupUseCaseImpl(
                 }
             }
 
-    private fun isValidBackupAuthor(metadata: BackupMetadata): Either<Failure, BackupMetadata> =
+    private fun isValidBackupAuthor(metadata: BackupInfo): Either<Failure, BackupInfo> =
         if (metadata.userId == userId.toString() || metadata.userId == userId.value) {
             Either.Right(metadata)
         } else {
             Either.Left(Failure(InvalidUserId))
         }
 
-    private suspend fun isFromOtherClient(metadata: BackupMetadata): Boolean =
-        metadata.clientId != currentClientIdProvider().fold({ "" }, { it.value })
+    private suspend fun isFromOtherClient(metadata: BackupInfo): Boolean =
+        true
 
     private companion object {
         const val TAG = "[RestoreBackupUseCase]"
@@ -265,28 +268,25 @@ internal class RestoreBackupUseCaseImpl(
 private const val EXTRACTED_FILES_PATH = "extractedFiles"
 
 
-private fun BackupData.Message.toMigratedMessage(): MigratedMessage = when (this) {
-    is BackupData.Message.Text -> MigratedMessage(
-        conversationId = conversationId,
-        senderUserId = senderUserId,
-        senderClientId = ClientId(senderClientId),
-        timestamp = time.toEpochMilliseconds(),
-        content = "",
-        unencryptedProto = ProtoContent.Readable(
-            messageId,
-            MessageContent.Text(
-                textValue,
-            ),
-            expectsReadConfirmation = false, //   data.expectsReadConfirmation ?: false,
-            legalHoldStatus =
+private fun ExportedMessage.toMigratedMessage(): MigratedMessage = MigratedMessage(
+    conversationId = ConversationId(conversationId.value, conversationId.domain),
+    senderUserId = UserId(senderUserId.value, senderUserId.domain),
+    senderClientId = ClientId(senderClientId),
+    timestamp = Instant.parse(timeIso).toEpochMilliseconds(),
+    content = "",
+    unencryptedProto = ProtoContent.Readable(
+        id,
+        MessageContent.Text(
+            (this.content as ExportedMessage.Content.Text).value.content,
+        ),
+        expectsReadConfirmation = false, //   data.expectsReadConfirmation ?: false,
+        legalHoldStatus =
 //                 if (data.legalHoldStatus == 2) Conversation.LegalHoldStatus.ENABLED
 //                 else
-            Conversation.LegalHoldStatus.DISABLED
-        ),
-        encryptedProto = null,
-        null,
-        null,
-        null
-    )
-}
-
+        Conversation.LegalHoldStatus.DISABLED
+    ),
+    encryptedProto = null,
+    null,
+    null,
+    null
+)

@@ -17,7 +17,7 @@
  */
 package com.wire.backup
 
-import com.wire.backup.data.Message
+import com.wire.backup.data.ExportMessage
 import com.wire.backup.export.MPBackupExporter
 import com.wire.backup.import.BackupImportResult
 import com.wire.backup.import.MPBackupImporter
@@ -33,7 +33,7 @@ class BackupEndToEndTest {
 
     @Test
     fun givenBackedUpMessages_whenRestoring_thenShouldReadTheSameContent() = runTest {
-        val expectedMessage = Message.Text(
+        val expectedMessage = ExportMessage.Text(
             "messageId",
             ConversationId("value", "domain"),
             UserId("user", "domain"),

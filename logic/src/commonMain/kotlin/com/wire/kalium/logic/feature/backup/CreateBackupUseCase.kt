@@ -19,8 +19,6 @@
 
 package com.wire.kalium.logic.feature.backup
 
-import com.wire.backup.data.BackupData
-import com.wire.backup.data.BackupMetadata
 import com.wire.backup.export.MPBackupExporter
 import com.wire.kalium.cryptography.backup.BackupCoder
 import com.wire.kalium.cryptography.backup.Passphrase
@@ -30,15 +28,14 @@ import com.wire.kalium.logic.StorageFailure
 import com.wire.kalium.logic.clientPlatform
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
 import com.wire.kalium.logic.data.conversation.ConversationRepository
-import com.wire.kalium.logic.data.id.IdMapper
-import com.wire.kalium.logic.data.user.UserId
-import com.wire.kalium.logic.data.user.UserRepository
-import com.wire.kalium.logic.di.MapperProvider
 import com.wire.kalium.logic.data.id.CurrentClientIdProvider
-import com.wire.kalium.logic.data.id.QualifiedID
+import com.wire.kalium.logic.data.id.IdMapper
 import com.wire.kalium.logic.data.message.Message
 import com.wire.kalium.logic.data.message.MessageContent
 import com.wire.kalium.logic.data.message.MessageRepository
+import com.wire.kalium.logic.data.user.UserId
+import com.wire.kalium.logic.data.user.UserRepository
+import com.wire.kalium.logic.di.MapperProvider
 import com.wire.kalium.logic.feature.backup.BackupConstants.BACKUP_ENCRYPTED_FILE_NAME
 import com.wire.kalium.logic.feature.backup.BackupConstants.BACKUP_METADATA_FILE_NAME
 import com.wire.kalium.logic.feature.backup.BackupConstants.BACKUP_USER_DB_NAME
@@ -52,9 +49,15 @@ import com.wire.kalium.logic.kaliumLogger
 import com.wire.kalium.logic.util.SecurityHelper
 import com.wire.kalium.logic.util.createCompressedFile
 import com.wire.kalium.persistence.backup.DatabaseExporter
+import com.wire.kalium.protobuf.backup.BackupInfo
+import com.wire.kalium.protobuf.backup.ExportedConversation
+import com.wire.kalium.protobuf.backup.ExportedMessage
+import com.wire.kalium.protobuf.backup.ExportedQualifiedId
+import com.wire.kalium.protobuf.backup.ExportedText
 import com.wire.kalium.util.DateTimeUtil
 import com.wire.kalium.util.KaliumDispatcher
 import com.wire.kalium.util.KaliumDispatcherImpl
+import io.ktor.utils.io.writer
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -97,33 +100,29 @@ internal class CreateBackupUseCaseImpl(
         deletePreviousBackupFiles(backupFilePath)
         val clientId = clientIdProvider().nullableFold({ null }, { it.value })
 
-        val exporter = MPBackupExporter(backupFilePath.toString(),
-            metaData = BackupMetadata(
-                platform = "Web", // TODO check if web handle android
-                version = "21",
-                userId.value,
-                creationTime = timeStamp,
-                clientId = clientId
-            )
-        )
+        val exporter = MPBackupExporter(userId)
 
         conversationRepository.getConversationList().getOrNull()?.firstOrNull()?.let { conversationList ->
             conversationList.forEach { conversation ->
                 messageRepository.getMessagesByConversationIdAndVisibility(
-                    conversation.id, 100, 0,
+                    conversation.id, 1000, 0,
                     listOf(Message.Visibility.VISIBLE)
                 ).firstOrNull()?.let { messageList ->
                     messageList.forEach { message ->
                         when (message) {
                             is Message.Regular -> when (message.content) {
                                 is MessageContent.Text -> exporter.add(
-                                    BackupData.Message.Text(
-                                        messageId = message.id,
-                                        conversationId = conversation.id,
-                                        time = message.date,
-                                        textValue = (message.content as MessageContent.Text).value,
-                                        senderUserId = message.senderUserId,
+                                    ExportedMessage(
+                                        senderUserId = ExportedQualifiedId(message.senderUserId.value, message.senderUserId.domain),
                                         senderClientId = message.senderClientId.value,
+                                        content = ExportedMessage.Content.Text(
+                                            ExportedText(
+                                                (message.content as MessageContent.Text).value
+                                            )
+                                        ),
+                                        id = message.id,
+                                        conversationId = ExportedQualifiedId(conversation.id.value, conversation.id.domain),
+                                        timeIso = message.date.toString(),
                                     )
                                 )
 
@@ -137,12 +136,21 @@ internal class CreateBackupUseCaseImpl(
 
                     }
                 }
-                exporter.add(conversation)
+                exporter.add(
+                    ExportedConversation(
+                        ExportedQualifiedId(conversation.id.value, conversation.id.domain),
+                        conversation.name.orEmpty()
+                    )
+                )
             }
         }
 
-
-        exporter.flushToFile()
+        val sink = kaliumFileSystem.sink(backupFilePath)
+        val buffer = sink.buffer()
+        buffer.write(exporter.serialize())
+        buffer.flush()
+        buffer.close()
+        sink.close()
 
 //         val plainDBPath =
 //             databaseExporter.exportToPlainDB(securityHelper.userDBOrSecretNull(userId))?.toPath()
@@ -161,7 +169,7 @@ internal class CreateBackupUseCaseImpl(
 //             databaseExporter.deleteBackupDBFile()
 //         }
 
-        println("KBX backupFilePath ${backupFilePath}")
+        println("KBX backupFilePath $backupFilePath")
         CreateBackupResult.Success(backupFilePath, 20_000, backupName)
     }
 
@@ -209,13 +217,12 @@ internal class CreateBackupUseCaseImpl(
 
     private suspend fun createMetadataFile(userId: UserId): Path {
         val clientId = clientIdProvider().nullableFold({ null }, { it.value })
-        val creationTime = DateTimeUtil.currentIsoDateTimeString()
-        val metadata = BackupMetadata(
+        val metadata = BackupInfo(
             clientPlatform,
             BackupCoder.version,
             userId.toString(),
-            creationTime,
-            clientId
+            "asdas",
+            "client"
         )
         val metadataJson = Json.encodeToString(metadata)
 

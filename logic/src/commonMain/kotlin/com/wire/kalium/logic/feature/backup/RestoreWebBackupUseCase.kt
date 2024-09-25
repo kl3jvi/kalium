@@ -19,7 +19,6 @@
 
 package com.wire.kalium.logic.feature.backup
 
-import com.wire.backup.data.BackupMetadata
 import com.wire.kalium.logic.data.asset.KaliumFileSystem
 import com.wire.kalium.logic.data.conversation.Conversation
 import com.wire.kalium.logic.data.conversation.ConversationMapper
@@ -43,6 +42,7 @@ import com.wire.kalium.logic.sync.slow.RestartSlowSyncProcessForRecoveryUseCase
 import com.wire.kalium.logic.util.decodeBufferSequence
 import com.wire.kalium.logic.wrapStorageRequest
 import com.wire.kalium.persistence.dao.MigrationDAO
+import com.wire.kalium.protobuf.backup.BackupInfo
 import com.wire.kalium.util.KaliumDispatcher
 import com.wire.kalium.util.KaliumDispatcherImpl
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +59,7 @@ interface RestoreWebBackupUseCase {
      * @param metadata Containing information about backup files
      * @return A [RestoreBackupResult] indicating the success or failure of the operation.
      */
-    suspend operator fun invoke(backupRootPath: Path, metadata: BackupMetadata): RestoreBackupResult
+    suspend operator fun invoke(backupRootPath: Path, metadata: BackupInfo): RestoreBackupResult
 }
 
 @Suppress("TooManyFunctions", "LongParameterList", "NestedBlockDepth")
@@ -73,7 +73,7 @@ internal class RestoreWebBackupUseCaseImpl(
     private val conversationMapper: ConversationMapper = MapperProvider.conversationMapper(selfUserId)
 ) : RestoreWebBackupUseCase {
 
-    override suspend operator fun invoke(backupRootPath: Path, metadata: BackupMetadata): RestoreBackupResult =
+    override suspend operator fun invoke(backupRootPath: Path, metadata: BackupInfo): RestoreBackupResult =
         withContext(dispatchers.io) {
             val version = metadata.version.toIntOrNull()
             if (version != null && version in OLDEST_SUPPORTED_WEB_VERSION..NEWEST_SUPPORTED_WEB_VERSION) {

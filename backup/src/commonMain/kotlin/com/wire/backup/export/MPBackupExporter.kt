@@ -17,48 +17,47 @@
  */
 package com.wire.backup.export
 
-import com.wire.backup.data.BackupData
-import com.wire.backup.data.BackupMetadata
-import com.wire.backup.data.Conversation
-import com.wire.backup.data.Message
-import com.wire.backup.data.User
 import com.wire.kalium.logic.data.user.UserId
-import kotlinx.datetime.Clock
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
+import com.wire.kalium.protobuf.backup.BackupData
+import com.wire.kalium.protobuf.backup.BackupInfo
+import com.wire.kalium.protobuf.backup.ExportUser
+import com.wire.kalium.protobuf.backup.ExportedConversation
+import com.wire.kalium.protobuf.backup.ExportedMessage
+import pbandk.encodeToByteArray
 
 class MPBackupExporter(val userId: UserId) {
-    private val allUsers = mutableListOf<User>()
-    private val allConversations = mutableListOf<Conversation>()
-    private val allMessages = mutableListOf<Message>()
+    private val allUsers = mutableListOf<ExportUser>()
+    private val allConversations = mutableListOf<ExportedConversation>()
+    private val allMessages = mutableListOf<ExportedMessage>()
 
-    fun add(user: User) {
+    fun add(user: ExportUser) {
         allUsers.add(user)
     }
 
-    fun add(conversation: Conversation) {
+    fun add(conversation: ExportedConversation) {
         allConversations.add(conversation)
     }
 
-    fun add(message: Message) {
+    fun add(message: ExportedMessage) {
         allMessages.add(message)
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
+    @OptIn(ExperimentalStdlibApi::class)
     fun serialize(): ByteArray {
         val backupData = BackupData(
-            BackupMetadata(
+            BackupInfo(
                 platform = "Common",
                 version = "1.0",
                 userId = "${userId.value}@${userId.domain}",
-                creationTime = Clock.System.now(),
-                clientId = null
+                creationTime = "Clock.System.now()",
+                clientId = "lol"
             ),
-            allUsers,
             allConversations,
-            allMessages
+            allMessages,
+            allUsers,
         )
-        return ProtoBuf.encodeToByteArray(backupData)
+        return backupData.encodeToByteArray().also {
+            println("!!!BACKUP: ${it.toHexString()}")
+        }
     }
 }
