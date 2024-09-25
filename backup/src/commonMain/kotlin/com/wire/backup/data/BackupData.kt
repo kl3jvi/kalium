@@ -20,31 +20,47 @@ package com.wire.backup.data
 import com.wire.kalium.logic.data.id.ConversationId
 import com.wire.kalium.logic.data.user.UserId
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
-sealed interface BackupData {
-//
-//     data class User(
-//         val id: QualifiedID,
-//         val name: String,
-//         val handle: String,
-//     ) : BackupData
-//
-    data class Conversation(val conversationId: ConversationId, val name: String) : BackupData
+@Serializable
+data class BackupData(
+    val metadata: BackupMetadata,
+    val users: List<User>,
+    val conversations: List<Conversation>,
+    val messages: List<Message>
+)
 
-    sealed interface Message : BackupData {
-        val messageId: String
-        val senderUserId: UserId
-        val conversationId: ConversationId
-        val time: Instant
-        val senderClientId: String
+@Serializable
+data class QualifiedID(
+    val domain: String,
+    val value: String,
+)
 
-        data class Text(
-            override val messageId: String,
-            override val conversationId: ConversationId,
-            override val senderUserId: UserId,
-            override val time: Instant,
-            override val senderClientId: String,
-            val textValue: String,
-        ) : Message
-    }
+@Serializable
+data class User(
+    val id: QualifiedID,
+    val name: String,
+    val handle: String,
+)
+
+@Serializable
+data class Conversation(val conversationId: ConversationId, val name: String)
+
+@Serializable
+sealed interface Message {
+    val messageId: String
+    val senderUserId: UserId
+    val conversationId: ConversationId
+    val time: Instant
+    val senderClientId: String
+
+    @Serializable
+    data class Text(
+        override val messageId: String,
+        override val conversationId: ConversationId,
+        override val senderUserId: UserId,
+        override val time: Instant,
+        override val senderClientId: String,
+        val textValue: String,
+    ) : Message
 }

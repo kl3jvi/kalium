@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see http://www.gnu.org/licenses/.
  */
-package com.wire.backup.zip
+package com.wire.backup.import
 
-internal enum class ZipEntries(val entryName: String) {
-    EVENTS("events.json"),
-    METADATA("export.json"),
-    CONVERSATIONS("conversations.json"),
-    USERS("users.json")
+import com.wire.backup.data.BackupData
+
+sealed interface BackupImportResult {
+    data object ParsingFailure : BackupImportResult
+    data class Success(val backupData: BackupData) : BackupImportResult
 }

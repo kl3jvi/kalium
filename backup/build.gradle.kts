@@ -26,7 +26,7 @@ plugins {
 }
 
 kaliumLibrary {
-    multiplatform { enableJs.set(false) }
+    multiplatform { enableJs.set(true) }
 }
 kotlin {
     val xcf = XCFramework()
@@ -46,6 +46,7 @@ kotlin {
                 implementation(libs.coroutines.core)
                 implementation(libs.ktxDateTime)
                 implementation(libs.ktxSerialization)
+                implementation(libs.ktxSerialization.protobuf)
                 implementation(libs.ktor.serialization)
 
                 implementation(libs.kmpIo)

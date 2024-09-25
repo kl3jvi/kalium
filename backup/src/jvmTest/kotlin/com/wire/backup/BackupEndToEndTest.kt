@@ -17,29 +17,23 @@
  */
 package com.wire.backup
 
-import com.wire.backup.data.BackupData
-import com.wire.backup.data.BackupMetadata
+import com.wire.backup.data.Message
 import com.wire.backup.export.MPBackupExporter
+import com.wire.backup.import.BackupImportResult
 import com.wire.backup.import.MPBackupImporter
 import com.wire.kalium.logic.data.id.ConversationId
 import com.wire.kalium.logic.data.user.UserId
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import java.io.File
-import kotlin.io.path.createTempDirectory
-import kotlin.io.path.pathString
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
+import kotlin.test.assertIs
 
 class BackupEndToEndTest {
 
-    private val rootPath = createTempDirectory().toAbsolutePath().pathString
-
     @Test
     fun givenBackedUpMessages_whenRestoring_thenShouldReadTheSameContent() = runTest {
-        val targetFile = File(rootPath, "backup.wbu")
-
-        val expectedMessage = BackupData.Message.Text(
+        val expectedMessage = Message.Text(
             "messageId",
             ConversationId("value", "domain"),
             UserId("user", "domain"),
@@ -47,29 +41,18 @@ class BackupEndToEndTest {
             "clientId",
             "Hello from the backup!"
         )
-        MPBackupExporter(targetFile.path, metaBackupData).apply {
-            add(expectedMessage)
-            flushToFile()
-        }
+        val exporter = MPBackupExporter(UserId("eghyue", "potato"))
+        exporter.add(expectedMessage)
+        val encoded = exporter.serialize()
 
-        val restoredMessages = mutableListOf<BackupData.Message>()
-        MPBackupImporter(targetFile.path, "selfDomain").import { importedData ->
-            when (importedData) {
-                is BackupData.Message -> restoredMessages.add(importedData)
-                is BackupData.Conversation -> {}
-            }
-        }
-        assertContentEquals(listOf(expectedMessage), restoredMessages)
+        val result = MPBackupImporter("potato").import(encoded)
+        assertIs<BackupImportResult.Success>(result)
+        assertContentEquals(listOf(expectedMessage), result.backupData.messages)
     }
 
-
-    companion object {
-        private val metaBackupData = BackupMetadata(
-            platform = "Android",
-            version = "21",
-            "userId",
-            creationTime = "2024-07-10T14:46:21.723Z",
-            clientId = "clientId"
-        )
+    @Test
+    fun givenBackUpDataIsUnrecognisable_whenRestoring_thenShouldReturnParsingError() = runTest {
+        val result = MPBackupImporter("potato").import(byteArrayOf(0x42, 0x42, 0x42))
+        assertIs<BackupImportResult.ParsingFailure>(result)
     }
 }

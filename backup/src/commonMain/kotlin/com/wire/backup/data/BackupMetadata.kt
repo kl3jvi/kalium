@@ -18,10 +18,9 @@
 
 package com.wire.backup.data
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class BackupMetadata(
@@ -32,11 +31,9 @@ data class BackupMetadata(
     @SerialName("user_id")
     val userId: String,
     @SerialName("creation_time")
-    val creationTime: String,
+    val creationTime: Instant,
     @SerialName("client_id")
     val clientId: String?
-) {
-    override fun toString(): String = Json.encodeToString(this)
-}
+)
 
 fun BackupMetadata.isWebBackup(): Boolean = platform == "Web"

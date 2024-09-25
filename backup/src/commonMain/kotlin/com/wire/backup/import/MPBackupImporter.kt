@@ -17,58 +17,17 @@
  */
 package com.wire.backup.import
 
-import com.oldguy.common.io.File
-import com.oldguy.common.io.FileMode
-import com.oldguy.common.io.ZipFile
 import com.wire.backup.data.BackupData
-import com.wire.backup.zip.ZipEntries
-import com.wire.kalium.logic.data.id.QualifiedID
-import com.wire.kalium.logic.data.web.KtxWebSerializer
-import com.wire.kalium.logic.data.web.WebEventContent
-import kotlinx.datetime.Instant
-import okio.Buffer
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 
-class MPBackupImporter(pathToFile: String, val selfUserDomain: String) {
+class MPBackupImporter(val selfUserDomain: String) {
 
-    private val zipFile = ZipFile(
-        File(pathToFile),
-        FileMode.Read
-    )
-
-    private suspend fun getWebEventsFromBackup(): List<WebEventContent> {
-        // TODO: Read other backed up files
-        val buffer = Buffer()
-        zipFile.use { file ->
-            file.readEntry(ZipEntries.EVENTS.entryName) { entry, content, count, isLast ->
-                buffer.write(content)
-            }
-        }
-        val fileString = buffer.readUtf8()
-        return KtxWebSerializer.json.decodeFromString<List<WebEventContent>>(fileString)
-    }
-
-    suspend fun import(onDataImported: (BackupData) -> Unit) {
-        val webStuff = getWebEventsFromBackup()
-        webStuff.forEach { webEvent ->
-            // webEvent -> BackupData
-            if (webEvent !is WebEventContent.Conversation) return@forEach
-
-            val backupData = when (webEvent) {
-                is WebEventContent.Conversation.AssetMessage -> null
-                is WebEventContent.Conversation.KnockMessage -> null
-                is WebEventContent.Conversation.NewGroup -> null
-                is WebEventContent.Conversation.TextMessage -> BackupData.Message.Text(
-                    messageId = webEvent.id,
-                    conversationId = webEvent.qualifiedConversation,
-                    senderUserId = webEvent.qualifiedFrom ?: QualifiedID(webEvent.from, selfUserDomain), // TODO: Bang bang!
-                    time = Instant.parse(webEvent.time),
-                    senderClientId = webEvent.fromClientId.orEmpty(),
-                    textValue = webEvent.data.text
-                )
-
-                WebEventContent.Unknown -> null
-            }
-            backupData?.let { onDataImported(it) }
-        }
+    @OptIn(ExperimentalSerializationApi::class)
+    fun import(data: ByteArray): BackupImportResult = try {
+        BackupImportResult.Success(ProtoBuf.decodeFromByteArray<BackupData>(data))
+    } catch (_: Exception) {
+        BackupImportResult.ParsingFailure
     }
 }
