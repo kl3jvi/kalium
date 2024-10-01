@@ -26,7 +26,7 @@ plugins {
 }
 
 kaliumLibrary {
-    multiplatform { enableJs.set(true) }
+    multiplatform { enableJs.set(false) }
 }
 kotlin {
     val xcf = XCFramework()
@@ -37,6 +37,11 @@ kotlin {
             xcf.add(this)
         }
     }
+    wasmJs {
+        browser()
+        binaries.library()
+        generateTypeScriptDefinitions()
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -44,13 +49,12 @@ kotlin {
                 implementation(project(":protobuf"))
                 implementation(libs.pbandk.runtime.common)
 
-                implementation(libs.ktor.utils)
+//                 implementation(libs.ktor.utils)
                 implementation(libs.coroutines.core)
                 implementation(libs.ktxDateTime)
                 implementation(libs.ktxSerialization)
-                implementation(libs.ktor.serialization)
 
-                implementation(libs.kmpIo)
+//                 implementation(libs.kmpIo)
                 implementation(libs.okio.core)
             }
         }

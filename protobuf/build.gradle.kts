@@ -38,6 +38,10 @@ val generatedFilesBaseDir = file("generated")
 generatedFilesBaseDir.mkdirs()
 
 kotlin {
+    wasmJs {
+        browser()
+        binaries.library()
+    }
     sourceSets {
         val commonMain by getting {
             kotlin.srcDir(generatedFilesBaseDir)
