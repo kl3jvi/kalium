@@ -71,10 +71,8 @@ internal actual class GlobalWorkSchedulerImpl(
         )
     }
 
-    actual override fun scheduleImmediateApiVersionUpdate() {
-        runBlocking {
-            scope.updateApiVersionsWorker.doWork()
-        }
+    actual override suspend fun scheduleImmediateApiVersionUpdate() {
+        scope.updateApiVersionsWorker.doWork()
     }
 }
 
