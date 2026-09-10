@@ -41,14 +41,19 @@
             </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
         </button>
         <div class="navigation-controls--break ui-kit_mobile-only"></div>
-        <div class="library-version" id="library-version">
+        <div class="library-version" id="library-version">e0c683f
         </div>
         <div class="navigation-controls">
         <div class="filter-section filter-section_loading" id="filter-section">
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":logic:dokkaHtmlPartial/androidMain">android</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":logic:dokkaHtmlPartial/appleMain">apple</button>
                 <button class="platform-tag platform-selector common-like" data-active="" data-filter=":logic:dokkaHtmlPartial/commonMain">common</button>
+                <button class="platform-tag platform-selector native-like" data-active="" data-filter=":logic:dokkaHtmlPartial/iosArm64Main">iosArm64</button>
+                <button class="platform-tag platform-selector common-like" data-active="" data-filter=":logic:dokkaHtmlPartial/iosMain">ios</button>
+                <button class="platform-tag platform-selector native-like" data-active="" data-filter=":logic:dokkaHtmlPartial/iosSimulatorArm64Main">iosSimulatorArm64</button>
                 <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":logic:dokkaHtmlPartial/jvmMain">jvm</button>
+                <button class="platform-tag platform-selector native-like" data-active="" data-filter=":logic:dokkaHtmlPartial/macosArm64Main">macosArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" data-filter=":logic:dokkaHtmlPartial/macosMain">macos</button>
             <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
                 <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
                 <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
@@ -78,11 +83,46 @@
                                 common
                             </label>
                         </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":logic:dokkaHtmlPartial/iosArm64Main" data-filter=":logic:dokkaHtmlPartial/iosArm64Main">
+                                <span class="checkbox--icon"></span>
+                                iosArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":logic:dokkaHtmlPartial/iosMain" data-filter=":logic:dokkaHtmlPartial/iosMain">
+                                <span class="checkbox--icon"></span>
+                                ios
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":logic:dokkaHtmlPartial/iosSimulatorArm64Main" data-filter=":logic:dokkaHtmlPartial/iosSimulatorArm64Main">
+                                <span class="checkbox--icon"></span>
+                                iosSimulatorArm64
+                            </label>
+                        </li>
                         <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
                             <label class="checkbox">
                                 <input type="checkbox" class="checkbox--input" id=":logic:dokkaHtmlPartial/jvmMain" data-filter=":logic:dokkaHtmlPartial/jvmMain">
                                 <span class="checkbox--icon"></span>
                                 jvm
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":logic:dokkaHtmlPartial/macosArm64Main" data-filter=":logic:dokkaHtmlPartial/macosArm64Main">
+                                <span class="checkbox--icon"></span>
+                                macosArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":logic:dokkaHtmlPartial/macosMain" data-filter=":logic:dokkaHtmlPartial/macosMain">
+                                <span class="checkbox--icon"></span>
+                                macos
                             </label>
                         </li>
                 </ul>
@@ -114,13 +154,13 @@
                 </div>
             </div>
             <div id="main">
-<div class="main-content" id="content" pageids="logic::////PointingToDeclaration//1228878352">
+<div class="main-content" id="content" pageids="logic::////PointingToDeclaration//378179821">
   <div class="breadcrumbs"></div>
   <div class="cover ">
     <h1 class="cover"><span><span>logic</span></span></h1>
     <div class="platform-hinted UnderCoverText with-platform-tabs" data-platform-hinted="data-platform-hinted">
-      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/androidMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":logic:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/appleMain" data-filterable-set=":logic:dokkaHtmlPartial/appleMain" data-toggle=":logic:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain" data-toggle=":logic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/jvmMain" data-filterable-set=":logic:dokkaHtmlPartial/jvmMain" data-toggle=":logic:dokkaHtmlPartial/jvmMain">jvm</button></div>
-<div class="content sourceset-dependent-content" data-active="" data-togglable=":logic:dokkaHtmlPartial/androidMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/appleMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/commonMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/jvmMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div>    </div>
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/androidMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain" data-active="" data-toggle=":logic:dokkaHtmlPartial/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/appleMain" data-filterable-set=":logic:dokkaHtmlPartial/appleMain" data-toggle=":logic:dokkaHtmlPartial/appleMain">apple</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain" data-toggle=":logic:dokkaHtmlPartial/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/iosArm64Main" data-filterable-set=":logic:dokkaHtmlPartial/iosArm64Main" data-toggle=":logic:dokkaHtmlPartial/iosArm64Main">iosArm64</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/iosMain" data-filterable-set=":logic:dokkaHtmlPartial/iosMain" data-toggle=":logic:dokkaHtmlPartial/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/iosSimulatorArm64Main" data-filterable-set=":logic:dokkaHtmlPartial/iosSimulatorArm64Main" data-toggle=":logic:dokkaHtmlPartial/iosSimulatorArm64Main">iosSimulatorArm64</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/jvmMain" data-filterable-set=":logic:dokkaHtmlPartial/jvmMain" data-toggle=":logic:dokkaHtmlPartial/jvmMain">jvm</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/macosArm64Main" data-filterable-set=":logic:dokkaHtmlPartial/macosArm64Main" data-toggle=":logic:dokkaHtmlPartial/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":logic:dokkaHtmlPartial/macosMain" data-filterable-set=":logic:dokkaHtmlPartial/macosMain" data-toggle=":logic:dokkaHtmlPartial/macosMain">macos</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":logic:dokkaHtmlPartial/androidMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/appleMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/commonMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/iosArm64Main"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/iosMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/iosSimulatorArm64Main"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/jvmMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/macosArm64Main"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div><div class="content sourceset-dependent-content" data-togglable=":logic:dokkaHtmlPartial/macosMain"><p class="paragraph">Higher level business logic operations, tying up single operations from other modules.</p></div>    </div>
   </div>
   <h2 class="">Packages</h2>
   <div class="table"><a data-name="-132647783%2FPackages%2F1228878352" anchor-label="com.wire.kalium.logic" id="-132647783%2FPackages%2F1228878352" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain"></a>
@@ -255,6 +295,24 @@
         <div></div>
       </div>
     </div>
+<a data-name="-159345834%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.data.app" id="-159345834%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.data.app/index.html">com.wire.kalium.logic.data.app</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-159345834%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
 <a data-name="-1013647707%2FPackages%2F1228878352" anchor-label="com.wire.kalium.logic.data.asset" id="-1013647707%2FPackages%2F1228878352" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain"></a>
     <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain">
       <div>
@@ -301,6 +359,24 @@
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.data.auth.login/index.html">com.wire.kalium.logic.data.auth.login</a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-772838446%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1791766242%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.data.auth.settings" id="-1791766242%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.data.auth.settings/index.html">com.wire.kalium.logic.data.auth.settings</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1791766242%2FPackages%2F867774983"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -600,6 +676,24 @@
         <div></div>
       </div>
     </div>
+<a data-name="1070667120%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.data.meeting" id="1070667120%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.data.meeting/index.html">com.wire.kalium.logic.data.meeting</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1070667120%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
 <a data-name="285664316%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.data.message" id="285664316%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
     <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
       <div>
@@ -654,18 +748,21 @@
         <div></div>
       </div>
     </div>
-<a data-name="-1137458468%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.data.message.linkpreview" id="-1137458468%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+<a data-name="-1137458468%2FPackages%2F1228878352" anchor-label="com.wire.kalium.logic.data.message.linkpreview" id="-1137458468%2FPackages%2F1228878352" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.data.message.linkpreview/index.html">com.wire.kalium.logic.data.message.linkpreview</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1137458468%2FPackages%2F867774983"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1137458468%2FPackages%2F1228878352"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
             <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">android</div>
+              <div class="platform-tag common-like">apple</div>
               <div class="platform-tag common-like">common</div>
+              <div class="platform-tag jvm-like">jvm</div>
             </div>
           </div>
         </div>
@@ -679,6 +776,24 @@
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.data.message.mention/index.html">com.wire.kalium.logic.data.message.mention</a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="984896824%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-739640062%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.data.message.paging" id="-739640062%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.data.message.paging/index.html">com.wire.kalium.logic.data.message.paging</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-739640062%2FPackages%2F867774983"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -1092,6 +1207,24 @@
         <div></div>
       </div>
     </div>
+<a data-name="-807296876%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.app" id="-807296876%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.feature.app/index.html">com.wire.kalium.logic.feature.app</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-807296876%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
 <a data-name="-1811493633%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.applock" id="-1811493633%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
     <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
       <div>
@@ -1293,13 +1426,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="612003599%2FPackages%2F1228878352" anchor-label="com.wire.kalium.logic.feature.call" id="612003599%2FPackages%2F1228878352" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain"></a>
-    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain">
+<a data-name="612003599%2FPackages%2F-421165011" anchor-label="com.wire.kalium.logic.feature.call" id="612003599%2FPackages%2F-421165011" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/iosArm64Main,:logic:dokkaHtmlPartial/iosSimulatorArm64Main,:logic:dokkaHtmlPartial/jvmMain,:logic:dokkaHtmlPartial/macosArm64Main"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/iosArm64Main,:logic:dokkaHtmlPartial/iosSimulatorArm64Main,:logic:dokkaHtmlPartial/jvmMain,:logic:dokkaHtmlPartial/macosArm64Main" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/iosArm64Main,:logic:dokkaHtmlPartial/iosSimulatorArm64Main,:logic:dokkaHtmlPartial/jvmMain,:logic:dokkaHtmlPartial/macosArm64Main">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.feature.call/index.html">com.wire.kalium.logic.feature.call</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="612003599%2FPackages%2F1228878352"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="612003599%2FPackages%2F-421165011"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -1307,7 +1440,10 @@
               <div class="platform-tag jvm-like">android</div>
               <div class="platform-tag common-like">apple</div>
               <div class="platform-tag common-like">common</div>
+              <div class="platform-tag native-like">iosArm64</div>
+              <div class="platform-tag native-like">iosSimulatorArm64</div>
               <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag native-like">macosArm64</div>
             </div>
           </div>
         </div>
@@ -1423,18 +1559,17 @@
         <div></div>
       </div>
     </div>
-<a data-name="1029963252%2FPackages%2F-757061202" anchor-label="com.wire.kalium.logic.feature.conversation" id="1029963252%2FPackages%2F-757061202" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/commonMain">
+<a data-name="1029963252%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.conversation" id="1029963252%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.feature.conversation/index.html">com.wire.kalium.logic.feature.conversation</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1029963252%2FPackages%2F-757061202"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1029963252%2FPackages%2F867774983"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
             <div class="platform-tags no-gutters">
-              <div class="platform-tag jvm-like">android</div>
               <div class="platform-tag common-like">common</div>
             </div>
           </div>
@@ -1748,18 +1883,35 @@
         <div></div>
       </div>
     </div>
-<a data-name="209920634%2FPackages%2F-757061202" anchor-label="com.wire.kalium.logic.feature.message" id="209920634%2FPackages%2F-757061202" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/commonMain"></a>
-    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/commonMain">
+<a data-name="994923438%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.meeting" id="994923438%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
-              <div><a href="com.wire.kalium.logic.feature.message/index.html">com.wire.kalium.logic.feature.message</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="209920634%2FPackages%2F-757061202"></span>
+              <div><a href="com.wire.kalium.logic.feature.meeting/index.html">com.wire.kalium.logic.feature.meeting</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="994923438%2FPackages%2F867774983"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
             <div class="platform-tags no-gutters">
-              <div class="platform-tag jvm-like">android</div>
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="209920634%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.message" id="209920634%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.feature.message/index.html">com.wire.kalium.logic.feature.message</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="209920634%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
               <div class="platform-tag common-like">common</div>
             </div>
           </div>
@@ -1828,6 +1980,24 @@
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.feature.message.ephemeral/index.html">com.wire.kalium.logic.feature.message.ephemeral</a></div>
 <span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1864418537%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-587295718%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.message.linkpreview" id="-587295718%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.feature.message.linkpreview/index.html">com.wire.kalium.logic.feature.message.linkpreview</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-587295718%2FPackages%2F867774983"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -2220,6 +2390,24 @@
         <div></div>
       </div>
     </div>
+<a data-name="-885484805%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.user.linkPreviews" id="-885484805%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.feature.user.linkPreviews/index.html">com.wire.kalium.logic.feature.user.linkPreviews</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-885484805%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
 <a data-name="207055132%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.feature.user.migration" id="207055132%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
     <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
       <div>
@@ -2532,6 +2720,24 @@
         <div></div>
       </div>
     </div>
+<a data-name="1990279898%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.sync.receiver.meeting" id="1990279898%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="com.wire.kalium.logic.sync.receiver.meeting/index.html">com.wire.kalium.logic.sync.receiver.meeting</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1990279898%2FPackages%2F867774983"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag common-like">common</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
 <a data-name="-891165345%2FPackages%2F867774983" anchor-label="com.wire.kalium.logic.sync.slow" id="-891165345%2FPackages%2F867774983" data-filterable-set=":logic:dokkaHtmlPartial/commonMain"></a>
     <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/commonMain" data-filterable-set=":logic:dokkaHtmlPartial/commonMain">
       <div>
@@ -2586,13 +2792,13 @@
         <div></div>
       </div>
     </div>
-<a data-name="-871234373%2FPackages%2F1228878352" anchor-label="com.wire.kalium.logic.util" id="-871234373%2FPackages%2F1228878352" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain"></a>
-    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/jvmMain">
+<a data-name="-871234373%2FPackages%2F-215869040" anchor-label="com.wire.kalium.logic.util" id="-871234373%2FPackages%2F-215869040" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/iosMain,:logic:dokkaHtmlPartial/jvmMain,:logic:dokkaHtmlPartial/macosMain"></a>
+    <div class="table-row" data-filterable-current=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/iosMain,:logic:dokkaHtmlPartial/jvmMain,:logic:dokkaHtmlPartial/macosMain" data-filterable-set=":logic:dokkaHtmlPartial/androidMain,:logic:dokkaHtmlPartial/appleMain,:logic:dokkaHtmlPartial/commonMain,:logic:dokkaHtmlPartial/iosMain,:logic:dokkaHtmlPartial/jvmMain,:logic:dokkaHtmlPartial/macosMain">
       <div>
         <div class="main-subrow ">
           <div class=""><span class="inline-flex">
               <div><a href="com.wire.kalium.logic.util/index.html">com.wire.kalium.logic.util</a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-871234373%2FPackages%2F1228878352"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-871234373%2FPackages%2F-215869040"></span>
                 <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
               </span></span></div>
           <div class="pull-right">
@@ -2600,7 +2806,9 @@
               <div class="platform-tag jvm-like">android</div>
               <div class="platform-tag common-like">apple</div>
               <div class="platform-tag common-like">common</div>
+              <div class="platform-tag common-like">ios</div>
               <div class="platform-tag jvm-like">jvm</div>
+              <div class="platform-tag native-like">macos</div>
             </div>
           </div>
         </div>
@@ -2611,7 +2819,7 @@
 </div>
     <div class="footer">
         <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
-        <span>© 2025 Copyright</span>
+        <span>© 2026 Copyright</span>
         <span class="pull-right">
             <span>Generated by </span>
             <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
